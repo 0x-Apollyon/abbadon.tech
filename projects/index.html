@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Abbadon: The home of Apollyon</title>
+    <link rel="icon" type="image/x-icon" href="./../icon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', serif;
+            background-color: black;
+            color: white;
+            margin: 0;
+            display: flex;
+            font-size: 12px;
+        }
+        .side-menu {
+            width: 250px;
+            background-color: #1a1a1a;
+            padding: 20px;
+            height: 100vh;
+        }
+        .side-menu h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .side-menu ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .side-menu li {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .side-menu li:hover {
+            background-color: #333;
+        }
+        .side-menu li.active {
+            background-color: #444;
+            font-weight: bold;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        .blog-title {
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .blog-post {
+            background-color: #1a1a1a;
+            margin-bottom: 20px;
+            padding: 15px;
+            display: none;
+        }
+        .blog-post.active {
+            display: block;
+        }
+        .blog-post h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .blog-post p {
+            font-size: 12px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <h2>Topics</h2>
+        <ul id="topicMenu">
+            <li data-topic="all" class="active">All Projects</li>
+            <li data-topic="cryptog">Cryptography</li>
+            <li data-topic="maldev">Malware Development</li>
+            <li data-topic="osint">OSINT</li>
+            <li data-topic="pentest">Pentesting</li>
+            <li data-topic="python">Python</li>
+            <li data-topic="thrunting">Threat Hunting</li>
+            <li data-topic="reveng">Reverse Engineering</li>
+            <li data-topic="js">Javascript</li>
+            <li data-topic="html">HTML CSS etc</li>
+            <li data-topic="ml">Machine Learning</li>
+
+        </ul>
+    </div>
+
+    <div class="content">
+        <div class="blog-title">Projects</div>
+
+        <a style="color: inherit; text-decoration: none;" href="https://github.com/0x-Apollyon/YA-CORS">
+            <div class="blog-post active" data-topics="maldev,js">
+                <h2>Malicious VS Code extensions</h2>
+                <p>A PoC demonstrating how attackers can weaponise VS Code extensions as an attack vector.</p>
+            </div>
+        </a>
+
+        <a style="color: inherit; text-decoration: none;" href="https://github.com/0x-Apollyon/AntiArgfuscator">
+            <div class="blog-post active" data-topics="python,ml">
+                <h2>AntiArgfuscator</h2>
+                <p>Detect command lines obfuscated using @Wietze's argfuscator and more using a XGBoost model.</p>
+            </div>
+        </a>
+
+        <a style="color: inherit; text-decoration: none;" href="https://github.com/0x-Apollyon/DOMS">
+            <div class="blog-post active" data-topics="python,thrunting">
+                <h2>DOMS: Document Object Model Similarity</h2>
+                <p>DOMS helps determine the similarity between two webpages based on both their code and visual appearance.</p>
+            </div>
+        </a>
+        
+        <a style="color: inherit; text-decoration: none;" href="https://github.com/0x-Apollyon/Papyrus">
+        <div class="blog-post active" data-topics="python,maldev,reveng" >
+            <h2>Papyrus - A python obfuscation, evasion and anti analysis framework</h2>
+            <p>Papyrus is a framework consisting of multiple features which make python source code harder to understand and analyse.</p>
+        </div>
+        </a>
+
+        <a style="color: inherit; text-decoration: none;" href="https://github.com/0x-Apollyon/DOMS">
+            <div class="blog-post active" data-topics="python,maldev">
+                <h2>Malnus Carlware</h2>
+                <p>A PoC demonstrating the use of chess moves over a lichess game for command and control (C2)</p>
+            </div>
+        </a>
+
+        <a style="color: inherit; text-decoration: none;" href="https://github.com/0x-Apollyon/RSA-Backdoor">
+            <div class="blog-post active" data-topics="python,cryptog">
+                <h2>RSA-Backdoor</h2>
+                <p>Implementation of a kleptographic backdoor (S.E.T.U.P) on the RSA algorithm</p>
+        </div>
+        </a>
+
+        <a style="color: inherit; text-decoration: none;" href="https://github.com/0x-Apollyon/Breachforums-CDN-Downloader">
+            <div class="blog-post active" data-topics="python,osint">
+                <h2>Breachforums CDN Downloader</h2>
+                <p>A tool to download all breachforums databases from emo's website.</p>
+        </div>
+        </a>
+
+        <a style="color: inherit; text-decoration: none;" href="https://github.com/0x-Apollyon/YA-CORS">
+        <div class="blog-post active" data-topics="python,pentest">
+            <h2>YA-CORS</h2>
+            <p>YetAnother-CORS misconfiguration scanner. Scans for miconfigured CORS headers.</p>
+        </div>
+        </a>
+
+        <a style="color: inherit; text-decoration: none;" href="https://github.com/0x-Apollyon/YA-LFI">
+        <div class="blog-post active" data-topics="python,pentest">
+            <h2>YA-LFI</h2>
+            <p>YetAnother-LFI. Looks for local file inclusion vulnerabilities by fuzzing endpoints. </p>
+        </div>
+        </a>
+
+        <a style="color: inherit; text-decoration: none;" href="https://0x-apollyon.github.io/Hookguide">
+            <div class="blog-post active" data-topics="python,thrunting,js,html">
+                <h2>Hooksguide</h2>
+                <p>Helping threat hunters with discord webhooks, bots and more</p>
+        </div>
+        </a>
+
+        <a style="color: inherit; text-decoration: none;" href="https://github.com/0x-Apollyon/Scrolls-256">
+            <div class="blog-post active" data-topics="python,cryptog">
+                <h2>Scrolls-256</h2>
+                <p>Very primitive 256 bit symmetric cipher. DO NOT USE THIS IN A PROD ENVIRONMENT</p>
+        </div>
+        </a>
+
+        <a style="color: inherit; text-decoration: none;" href="https://github.com/0x-Apollyon/Discord_DB">
+            <div class="blog-post active" data-topics="python">
+                <h2>Discord_DB</h2>
+                <p>A tool which allows you to use discord as a database. Free infinite storage glitch</p>
+        </div>
+        </a>
+
+        <a style="color: inherit; text-decoration: none;" href="https://github.com/0x-Apollyon/0xChat">
+            <div class="blog-post active" data-topics="python">
+                <h2>0xChat</h2>
+                <p>An end-to-end encrypted messaging service. Made as a highschool projects</p>
+        </div>
+        </a>
+
+        <a style="color: inherit; text-decoration: none;" href="https://github.com/0x-Apollyon/URX">
+            <div class="blog-post active" data-topics="python,js,html">
+                <h2>URX</h2>
+                <p>A basic URL shortening service. This idea of the URL shortener and its features comes from the "Don't spoil the surprise" proposal submitted to CCExtractor in GSoC 2024.</p>
+        </div>
+        </a>
+
+        <div class="blog-post active" data-topics="more">
+            <h3>More Stuff</h3>
+            <p>Coming soon ...</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('topicMenu').addEventListener('click', function(e) {
+            // Remove active class from all menu items
+            document.querySelectorAll('#topicMenu li').forEach(li => {
+                li.classList.remove('active');
+            });
+
+            // Add active class to clicked item
+            e.target.classList.add('active');
+
+            // Get selected topic
+            const selectedTopic = e.target.getAttribute('data-topic');
+
+            // Show/hide blog posts
+            document.querySelectorAll('.blog-post').forEach(post => {
+                if (selectedTopic === 'all' || 
+                    post.getAttribute('data-topics').split(',').includes(selectedTopic)) {
+                    post.classList.add('active');
+                } else {
+                    post.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact - Abbadon: The home of Apollyon</title>
+    <link rel="icon" type="image/x-icon" href="./../icon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', serif;
+            background-color: black;
+            color: white;
+            margin: 0;
+            display: flex;
+            font-size: 12px;
+        }
+        .side-menu {
+            width: 250px;
+            background-color: #1a1a1a;
+            padding: 20px;
+            height: 100vh;
+        }
+        .side-menu h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .side-menu ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .side-menu li {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .side-menu li:hover {
+            background-color: #333;
+        }
+        .side-menu li.active {
+            background-color: #444;
+            font-weight: bold;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .page-title {
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .pgp-key-container, .social-links {
+            background-color: #1a1a1a;
+            padding: 25px;
+            width: 80%;
+            max-width: 600px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .pgp-key-container h3, .social-links h3 {
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .social-links {
+            text-align: center;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 15px;
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .social-links a:hover {
+            color: #00ff00;
+        }
+        .pgp-key-box {
+            background-color: #1a1a1a;
+            padding: 15px;
+            border: 1px solid #333;
+            font-family: monospace;
+            font-size: 10px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            text-align: center;
+        }
+        .copy-button {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background-color: #444;
+            color: white;
+            border: none;
+            font-size: 10px;
+            padding: 5px 8px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', serif;
+        }
+        .copy-button:hover {
+            background-color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="page-title">Contact</div>
+        
+        <!-- PGP Key Section -->
+        <div class="pgp-key-container">
+            <h3>PGP Public Key</h3>
+            <button class="copy-button" onclick="copyPGPKey()">Copy</button>
+            <div class="pgp-key-box" id="pgp-key">
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mDMEZ703nhYJKwYBBAHaRw8BAQdAhrDldyGzBoVpW9qNJDok0On7j0EKMAkG2kGC
+iUVV0v20MkFwb2xseW9uIChBcG9sbHlvbiBFQ0Mga2V5IHBhaXIpIDxvYXhwbHlu
+QGNvY2subGk+iJkEExYKAEEWIQQHL38KYUHsW1SXCyzq9qa1dPJXHQUCZ703ngIb
+AwUJEswDAAULCQgHAgIiAgYVCgkICwIEFgIDAQIeBwIXgAAKCRDq9qa1dPJXHT/8
+AQDDa7cpqeM8B8vaglsemWW1lvB7tDglLyrYJ7yFwY43CAD+IcRC0z1hnM5ua7rq
+r6/gB1RKlngrXFXoTbEZNQ8/zg+4OARnvTeeEgorBgEEAZdVAQUBAQdA+oCp5VCQ
+xlyUldP6dBsL2Oa246pZs2FyN+lRtT60dAoDAQgHiH4EGBYKACYWIQQHL38KYUHs
+W1SXCyzq9qa1dPJXHQUCZ703ngIbDAUJEswDAAAKCRDq9qa1dPJXHeQ0AP4/pioC
+PCgyhPmRelNzqV8H0TFWw0/V2Fi4ukf2fGOkQwD+NEPDU7w66voff0EmQqTCh3nq
+vdRIokPbmayZCzOXwgA==HDsF
+
+-----END PGP PUBLIC KEY BLOCK-----
+            </div>
+        </div>
+        
+        <!-- Social Links -->
+        <div class="social-links">
+            <h3>Find Me Online</h3>
+            <a href="https://github.com/0x-Apollyon" target="_blank">GitHub : 0x-Apollyon</a> <br> <br>
+            <a href="https://twitter.com/0xApollyon" target="_blank">Twitter : 0xApollyon</a> <br> <br>
+            <a>Discord: 0xapollyon</a> <br><br>
+            <a href="mailto:oaxplyn@cock.li">Mail: oaxplyn@cock.li</a> <br><br>
+            <a></a>
+        </div>
+    </div>
+
+    <script>
+        function copyPGPKey() {
+            const pgpKey = document.getElementById('pgp-key').innerText;
+            navigator.clipboard.writeText(pgpKey)
+                .then(() => {
+                    const copyButton = document.querySelector('.copy-button');
+                    copyButton.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyButton.textContent = 'Copy';
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Error copying text: ', err);
+                });
+        }
+    </script>
+</body>
+</html>

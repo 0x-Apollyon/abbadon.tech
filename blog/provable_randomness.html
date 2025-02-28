@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Provable Randomness in Online Gambling</title>
+    <link rel="icon" type="image/x-icon" href="./icon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', serif;
+            background-color: black;
+            color: white;
+            margin: 0;
+            display: flex;
+            font-size: 12px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .side-menu {
+            width: 250px;
+            background-color: #1a1a1a;
+            padding: 20px;
+            height: auto;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .home-button {
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .home-button:hover {
+            background-color: #444;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .blog-title {
+            font-size: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .blog-post {
+            background-color: #1a1a1a;
+            margin-bottom: 20px;
+            padding: 25px;
+        }
+        .blog-post h2 {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #00ff00;
+        }
+        .blog-post p {
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        .code-block {
+            background-color: #2a2a2a;
+            padding: 15px;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+            font-family: "Source Code Pro", monospace;
+            color: #fff; /* Optional: Makes text readable on dark background */
+        }
+
+        .highlight {
+            color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <a href="index.html" class="home-button">Back to Home</a>
+    </div>
+
+    <div class="content">
+        <div class="blog-title">Provable, Fair Randomness in Online Gambling</div>
+        
+        <div class="blog-post">
+            <h2>Introduction</h2>
+            <p>In recent years, online gambling platforms such as Stake have experienced significant growth, generating billions of dollars in profit. This raises a critical question: <span class="highlight">How can we be certain that these online platforms are not rigging the games against their users?</span></p>
+
+            <p>In this paper, we will explore the creation of a provably fair and random game similar to Mines, which is one of the most popular gambling games available.</p>
+
+            <p>All the code in this paper will be in Python, so a basic understanding of Python would be helpful.</p>
+
+            <h2>Requirements</h2>
+            <p>Our implementation has three key requirements:</p>
+            <p>
+            • The position of the mines should be random <br>
+            • The user should not be able to determine the position of the mines with any probability greater than what would occur by random chance <br>
+            • The user should be able to see the position of the mines and determine whether the game was fair or not once it ends <br>
+            </p>
+
+            <h2>Code Implementation</h2>
+            <p>We'll be designing a game of Mines where the grid is of size n*n and has m mines. For this example, we'll consider a grid of size 3*3 with 1 mine, but you can tweak these parameters as needed.</p>
+
+            <div class="code-block">
+# Game Configuration
+square_size = 3
+number_of_mines = 1
+number_of_tiles = square_size * square_size
+number_of_gems = number_of_tiles - number_of_mines
+
+if number_of_tiles < number_of_mines:
+    print("Number of tiles can't be less than number of mines")
+    quit()
+
+# Create game layout
+game_layout = []
+
+# Add mines
+for i in range(number_of_mines):
+    game_layout.append(1)
+
+# Add gems
+for i in range(number_of_gems):
+    game_layout.append(0)
+
+# game_layout is an array with 1s (mines) and 0s (gems)
+            </div>
+
+            <h2>Adding Randomness</h2>
+            <p>We'll use Python's random module and the os module for generating cryptographically secure randomness:</p>
+
+            <div class="code-block">
+import random
+import os
+
+# Generate cryptographically random server seed
+server_seed = os.urandom(32)
+random.seed(server_seed)
+random.shuffle(game_layout)
+            </div>
+
+            <p>This generates a cryptographically random 32-byte value and uses it to seed the Python PRNG (Pseudo Random Number Generator), shuffling the game layout.</p>
+
+            <h2>Enhanced Randomness with Client Seed</h2>
+            <p>To prevent manipulation, we incorporate a client-side seed:</p>
+
+            <div class="code-block">
+import random
+import os
+import hashlib
+
+# Generate server seed and its hash
+server_seed = hashlib.sha256(os.urandom(32)).hexdigest()
+server_seed_hashed = hashlib.sha256(server_seed.encode()).hexdigest()
+
+# Display server seed hash
+print(f"The current server seed hash is {server_seed_hashed}")
+
+# Get client seed
+client_seed = input("Enter client seed: ").strip()
+client_seed_hashed = hashlib.sha256(client_seed.encode()).hexdigest()
+
+# Create final seed
+final_seed = client_seed_hashed + server_seed
+
+# Shuffle game layout
+random.seed(final_seed)
+random.shuffle(game_layout)
+            </div>
+
+            <h2>Game Logic and State Management</h2>
+            <div class="code-block">
+# Convert 1D layout to 2D grid
+square_layout = []
+square_row = []
+for j, i in enumerate(game_layout):
+    square_row.append(i)
+    if (j+1) % square_size == 0:
+        square_layout.append(square_row)
+        square_row = []
+
+# Initialize game state
+mine_struck = False 
+game_state = []
+for i in range(square_size):
+    row = [0] * square_size
+    game_state.append(row)
+
+# Game loop
+while not mine_struck:
+    # Display current game board
+    print("\n")
+    for i, row in enumerate(square_layout):
+        for j, element in enumerate(row):
+            if game_state[i][j] == 0:
+                print(f"  [{i+1} , {j+1}]  ", end="")
+            else:
+                print("     *     ", end="")
+        print("")
+    print("\n")
+
+    # Get user input
+    coords = input("Select the tile with its numbers split with a comma or quit to end the game: ").strip()
+    
+    if coords != "quit":
+        coords = coords.split(",")
+        first_coord = int(coords[0])
+        second_coord = int(coords[1])
+
+        # Check if mine is struck
+        if square_layout[first_coord-1][second_coord-1] == 1:
+            print("You hit the mine. BOOM !!")
+            print(f"Client seed for verification: {server_seed}")
+            mine_struck = True
+        else:
+            game_state[first_coord-1][second_coord-1] = 1
+    else:
+        print("Game ended")
+        print(f"Client seed for verification: {server_seed}")
+        mine_struck = True
+            </div>
+
+            <h2>Client-Side Verification</h2>
+            <div class="code-block">
+# Verification Script
+square_size = 3
+number_of_mines = 1
+number_of_tiles = square_size * square_size
+number_of_gems = number_of_tiles - number_of_mines
+
+# Create game layout
+game_layout = []
+for i in range(number_of_mines):
+    game_layout.append(1)
+for i in range(number_of_gems):
+    game_layout.append(0)
+
+import hashlib
+import random
+
+# Get verification inputs
+client_input = input("What was the client input: ").strip()
+server_seed = input("What was the final revealed server seed: ").strip()
+server_seed_hash = input("What was the initially revealed server seed hash: ").strip()
+
+# Verify seed and hash
+client_input_hashed = hashlib.sha256(client_input.encode()).hexdigest()
+final_seed = client_input_hashed + server_seed
+
+# Check seed integrity
+if hashlib.sha256(server_seed.encode()).hexdigest() == server_seed_hash:
+    print("Server Seed Hash verified. The game was provably fair.")
+else:
+    print("Server Seed Hash verification failed, the game wasn't fair.")
+
+# Reproduce game layout
+random.seed(final_seed)
+random.shuffle(game_layout)
+
+# Display final layout
+for j, i in enumerate(game_layout):
+    if i == 0:
+        print("   GEM   ", end="")
+    else:
+        print("   MINE  ", end="")
+
+    if (j+1) % square_size == 0:
+        print()
+            </div>
+
+            <h2>Conclusion</h2>
+            <p>This is a fundamental example using the game Mines, but the principles of provable randomness can be applied to all types of gambling games.</p>
+
+            <p>Full code available at: <a href="https://github.com/0x-Apollyon/Provable-Randomness">github.com/0x-Apollyon/Provable-Randomness</a></p>
+        </div>
+    </div>
+</body>
+</html>
