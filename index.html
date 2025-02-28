@@ -69,11 +69,78 @@
     <a style="color: inherit; text-decoration: none;"  href="./contact/index.html"> Contact </a> <br> <br> <br>
   </p>
 </center>
-                                                                                                                                               
 
+<script>
+    const originalTitle = document.title;
+    const originalFavicon = document.querySelector("link[rel='icon']").href;
+
+    const tabDisguises = [
+        {
+            title: "Inbox (13) - Gmail",
+            favicon: "gmail_favicon.png"
+        },
+        {
+            title: "GitHub",
+            favicon: "github_icon.png"
+        },
+        {
+            title: "(2) Discord | Friends",
+            favicon: "discord_icon.png"
+        },
+        {
+            title: "Home / X",
+            favicon: "x_favicon.png"
+        },
+        {
+            title: "ChatGPT",
+            favicon: "chatgpt_favicon.png"
+        },
+        {
+            title: "Claude",
+            favicon: "claude_icon.png"
+        },
+        {
+            title: "Welcome to fbi.gov - FBI",
+            favicon: "fbi_favicon.png"
+        },
+        {
+            title: "We are the nations first line of defense - CIA",
+            favicon: "cia_favicon.png"
+        }
+    ];
+
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            const randomIndex = Math.floor(Math.random() * tabDisguises.length);
+            const selectedDisguise = tabDisguises[randomIndex];
+            
+            document.title = selectedDisguise.title;
+            
+            const currentFavicon = document.querySelector("link[rel='icon']");
+            if (currentFavicon) {
+                document.head.removeChild(currentFavicon);
+            }
+            
+            const newFavicon = document.createElement('link');
+            newFavicon.rel = 'icon';
+            newFavicon.type = 'image/x-icon';
+            newFavicon.href = selectedDisguise.favicon;
+            document.head.appendChild(newFavicon);
+        } else {
+            document.title = originalTitle;
+            
+            const currentFavicon = document.querySelector("link[rel='icon']");
+            if (currentFavicon) {
+                document.head.removeChild(currentFavicon);
+            }
+            
+            const restoreFavicon = document.createElement('link');
+            restoreFavicon.rel = 'icon';
+            restoreFavicon.type = 'image/x-icon';
+            restoreFavicon.href = originalFavicon;
+            document.head.appendChild(restoreFavicon);
+        }
+    });
+</script>
 </body>
-</html>                                                                                                                                               
-                                                                                                                                               
-                                                                                                                                               
-                                                                                                                                               
-                                                                                                                                               
+</html>
