@@ -215,7 +215,7 @@ Every request must be authenticated, and the users subscription status should be
             <h2>6: Firebase on fire (This is also applicable to Supabase and other similar services)</h2>
             <p>Many SaaS projects, especially those without a dedicated backend, use services like Firebase for authentication and data storage (firestore, real time db). If improperly configured, anyone can access these databases and read, write stuff to them. 
             </p>
-            <p>This has been a recurring vulnerability, especially with startups (chattr.ai, Arc Browser, Schmooze(I FOUND THIS ONE !!!, got ghosted by them tho)). These are just a few examples. Many more SaaS startups and apps have been caught leaking private user data due to bad Firebase/Supabase configs.
+            <p>This has been a recurring vulnerability, especially with startups (chattr.ai, Arc Browser). These are just a few examples. Many more SaaS startups and apps have been caught leaking private user data due to bad Firebase/Supabase configs.
             </p>
             <p>
                 The root of the problem is default public access. By default, Firebase Realtime Database and Firestore allow public read/write access until rules are manually set. Below is a very common and very insecure security rule.
