@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mersenne Twister: The algorithm which fakes randomness really well</title>
+    <link rel="icon" type="image/x-icon" href="./../icon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', serif;
+            background-color: black;
+            color: white;
+            margin: 0;
+            display: flex;
+            font-size: 12px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .side-menu {
+            width: 250px;
+            background-color: #1a1a1a;
+            padding: 20px;
+            height: auto;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .home-button {
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .home-button:hover {
+            background-color: #444;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .blog-title {
+            font-size: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .blog-post {
+            background-color: #1a1a1a;
+            margin-bottom: 20px;
+            padding: 25px;
+        }
+        .blog-post h2 {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #00ff00;
+        }
+        .blog-post p {
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        .code-block {
+            background-color: #2a2a2a;
+            padding: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+            font-family: "Source Code Pro", monospace;
+            color: #fff; /* Optional: Makes text readable on dark background */
+        }
+
+        .highlight {
+            color: #00ff00;
+        }
+
+
+        details {
+            background-color: #2a2a2a;
+            margin: 15px 0;
+        }
+
+        details summary {
+            padding: 15px;
+            cursor: pointer;
+            font-family: "Source Code Pro", monospace;
+            color: #fff;
+        }
+
+        details div {
+            padding: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+            font-family: "Source Code Pro", monospace;
+            color: #fff;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <a href="index.html" class="home-button">Back to Home</a>
+    </div>
+
+    <div class="content">
+        <div class="blog-title">Mersenne Twister: The algorithm which fakes randomness really well</div>
+
+        <details>
+            <summary>[README] Warning: Jargon heavy paper [README]</summary>
+            <div>
+                <p>This paper is rather jargon heavy for non technical people and beginners who do not know much about cryptography or random number generation. So, here we cover most of the technical jargon and words used in this paper.
+
+<span class="highlight">Pseudo Random Number Generator (PRNG):</span> An algorithm which generates statistically random-like numbers using deterministic logic <br>
+<span class="highlight">Seed:</span> The initial value to start a PRNG <br>
+<span class="highlight">Internal State:</span> A set of values used by the PRNG to generate further outputs <br>
+<span class="highlight">Diffusion:</span> A property where a small change spreads out and affects many parts of the output <br>
+<span class="highlight">Avalanche effect:</span> When a small change in input leads to a large, unpredictable change in output <br>
+<span class="highlight">Hash function:</span> A function that converts input data into a fixed-size string of bytes <br>
+<span class="highlight">Cryptographic hash function:</span> A hash function designed to be secure and suitable for cryptographic use for example SHA256, BlAKE2 etc  <br>
+<span class="highlight">Cryptographically Secure Pseudo Random Number Generator (CSPRNG):</span> A type of PRNG where predicting the future or past outputs in not possible <br>
+<span class="highlight">Bitwise AND:</span> An operation that compares bits of two numbers and returns 1s only where both have 1s <br>
+<span class="highlight">Bitwise XOR:</span> Bitwise exclusive OR which returns 1 if bits differ, 0 if they are the same <br>
+<span class="highlight">Bitshift:</span> Moves bits left or right within a number <br>
+<span class="highlight">Hamming weight:</span> The number of 1s in a binary representation of a number. High Hamming weight = many bits set as 1 <br>
+                    
+You will also see many arbitary constant values in the code of the paper, a basic explanation of why those constants are used has been provided. All of them are the part of the MT19937 specification</p>
+        </details>
+
+        <div class="blog-post">
+            <h2>Introduction</h2>
+            <p>The Mersenne Twister (MT) is arguably the most well known pseudorandom number generator (PRNG) in existence. It was developed in the 1990s by Japanese cryptographers Makoto Matsumoto and Takuji Nishimura. Today, it is used as the default PRNG in languages such as PHP, Python and R. 
+            </p>
+            <p>
+                Its name comes from the fact that it has period length 2^19937 -1, a Mersenne Prime
+            </p>
+            <p>While MT has several variants, we will only be talking about the standard implementation ie the MT19937. MT19937 is a 32 bit generator and it is used by Python as its default generator.</p>
+        </div>
+
+        <div class="blog-post">
+            <h2>A high level look at MT19937</h2>
+            <p>Like all PRNGs, we start our journey at the seed value. It is the input a PRNG recieves from which it populates its internal state and finally generates the random numbers. Once the seed value is recieved, the generator extends it to populate its internal state. </p>
+                
+            <p>MT19937 has an <span class="highlight">internal state array containing 624 elements, each element being a 32 bit integer.</span> There exist many algorithms to convert the seed to the initial state, but we will be primarily focusing on how it is done in the Python default generator ie the random module.
+            </p>
+
+            <p>In the random module, seeding can be done using random.seed(value-here) where the value can be anything, an integer, a float, a string or even a bytearray. First the seed undergoes preprocessing, where its type is determined and it is processed accordingly, and a key array is constructed from the seed. </p>
+                
+            <p>After this the 624 element state array is constructed using a constant value. Once the base state is ready, the key array is diffused throughout the state. This process of <span class="highlight">"state mixing"</span> takes place twice and then with a few minor changes, the initial state is ready. Once the initial state is ready, it undergoes the <span class="highlight">"twist"</span> operation and then you can start generating random numbers.</p>
+
+            <p>Think of MT19937 as a gun and the random numbers as the bullets. With the initialization process, the parts have been assembled into the actual gun. Now think of the twist operation as putting in a magazine containing 624 bullets. </p>
+                
+            <p>Every time MT19937 has the generate a new random number, it takes the integer at the i-th index. <span class="highlight">This integer now undergoes another operation known as "tempering", and the tempered value is the output you recieve. Once you have generated 624 random numbers, the internal state undergoes the twist operation once again </span>, think of it as putting in another magazine after using all the bullets.
+            </p>
+
+            <div style="font-family: 'Courier New', monospace; background: #1a1a1a; color: #00FF00; line-height: 1.5; padding: 20px; max-width: 400px; margin: 0 auto;">
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h1 style="font-size: 1.8rem; font-weight: 600; color: #00FF00; margin-bottom: 8px; margin: 0 0 8px 0;">MT19937</h1>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <div style="background: #1a1a1a; border: 2px solid #00FF00; padding: 20px; width: 100%; max-width: 350px; text-align: center; margin-bottom: 10px;">
+                        <div style="font-size: 1.1rem; font-weight: 600; color: #00FF00; margin-bottom: 8px;">1. Seed Input</div>
+                        <div style="font-size: 0.85rem; color: #00FF00; margin-bottom: 6px;">Initialize with seed value</div>
+                        <div style="color: #00FF00; font-family: 'Courier New', monospace; font-size: 0.8rem; margin-top: 4px;">seed(5489)</div>
+                        <div style="font-size: 0.8rem; color: #00FF00; margin-top: 4px;">32-bit integer</div>
+                    </div>
+                    <div style="width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 20px solid #00FF00; margin: 10px auto;"></div>
+            
+                    <div style="background: #1a1a1a; border: 2px solid #00FF00; padding: 20px; width: 100%; max-width: 350px; text-align: center; margin-bottom: 10px;">
+                        <div style="font-size: 1.1rem; font-weight: 600; color: #00FF00; margin-bottom: 8px;">2. State Array</div>
+                        <div style="font-size: 0.85rem; color: #00FF00; margin-bottom: 6px;">Populate 624 elements</div>
+                        <div style="color: #00FF00; font-family: 'Courier New', monospace; font-size: 0.8rem; margin-top: 4px;">state[0..623]</div>
+                        <div style="font-size: 0.8rem; color: #00FF00; margin-top: 4px;">Extend seed into array</div>
+                        <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; margin-top: 8px; justify-content: center;">
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                            <div style="width: 12px; height: 12px; background: #003300; border: 1px solid #005500;"></div>
+                        </div>
+                    </div>
+                    <div style="width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 20px solid #00FF00; margin: 10px auto;"></div>
+            
+                    <div style="background: #1a1a1a; border: 2px solid #00FF00; padding: 20px; width: 100%; max-width: 350px; text-align: center; margin-bottom: 10px;">
+                        <div style="font-size: 1.1rem; font-weight: 600; color: #00FF00; margin-bottom: 8px;">3. Twist Operation</div>
+                        <div style="font-size: 0.85rem; color: #00FF00; margin-bottom: 6px;">Generate new state values</div>
+                        <div style="color: #00FF00; font-family: 'Courier New', monospace; font-size: 0.8rem; margin-top: 4px;">twist() → new_state[]</div>
+                        <div style="font-size: 0.8rem; color: #00FF00; margin-top: 4px;">Updates all 624 elements</div>
+                    </div>
+                    <div style="width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 20px solid #00FF00; margin: 10px auto;"></div>
+            
+                    <div style="background: #1a1a1a; border: 2px solid #00FF00; padding: 20px; width: 100%; max-width: 350px; text-align: center; margin-bottom: 10px;">
+                        <div style="font-size: 1.1rem; font-weight: 600; color: #00FF00; margin-bottom: 8px;">4. Extract Value</div>
+                        <div style="font-size: 0.85rem; color: #00FF00; margin-bottom: 6px;">Get next state element</div>
+                        <div style="color: #00FF00; font-family: 'Courier New', monospace; font-size: 0.8rem; margin-top: 4px;">value = state[index]</div>
+                        <div style="font-size: 0.8rem; color: #00FF00; margin-top: 4px;">Index increments each call</div>
+                    </div>
+                    <div style="width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 20px solid #00FF00; margin: 10px auto;"></div>
+            
+                    <div style="background: #1a1a1a; border: 2px solid #00FF00; padding: 20px; width: 100%; max-width: 350px; text-align: center; margin-bottom: 10px;">
+                        <div style="font-size: 1.1rem; font-weight: 600; color: #00FF00; margin-bottom: 8px;">5. Tempering</div>
+                        <div style="font-size: 0.85rem; color: #00FF00; margin-bottom: 6px;">Transform state value</div>
+                        <div style="color: #00FF00; font-family: 'Courier New', monospace; font-size: 0.8rem; margin-top: 4px;">temper(value) → output</div>
+                        <div style="font-size: 0.8rem; color: #00FF00; margin-top: 4px;">Bit shifts & XOR operations</div>
+                    </div>
+                    <div style="width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 20px solid #00FF00; margin: 10px auto;"></div>
+            
+                    <div style="background: #1a1a1a; border: 2px solid #00FF00; padding: 20px; width: 100%; max-width: 350px; text-align: center; margin-bottom: 10px;">
+                        <div style="font-size: 1.1rem; font-weight: 600; color: #00FF00; margin-bottom: 8px;">6. Random Output</div>
+                        <div style="font-size: 0.85rem; color: #00FF00; margin-bottom: 6px;">32-bit random number</div>
+                        <div style="color: #00FF00; font-family: 'Courier New', monospace; font-size: 0.8rem; margin-top: 4px;">0x3A7F2B1E</div>
+                        <div style="font-size: 0.8rem; color: #00FF00; margin-top: 4px;">Final pseudorandom value</div>
+                    </div>
+                </div>
+            </div>
+
+            <p>Now we will deep dive into how each one of these operations is implemented.</p>
+        </div>
+
+        <div class="blog-post">
+            <h2>Assembling the gun: Seeding and state initialization</h2>
+            <p>As stated earlier, MT19937 can take any integer, float, string or a bytearray as its input. Python processes the seed using a mutli step process, first the type of the seed is determined. </p>
+            <p>If the seed type is INT (integer), it is used directly. If it is a float, then python uses a non cryptographic hash function to process it. If it is a string or bytearray, the python uses the SHA2-512 cryptographic hash function to convert it into an integer.</p>
+            <p>Once the pre-processing is done, the seed value is split into <span class="highlight">32 bit chunks from right to left</span>. For example if the seed after pre-processing is 0x909192939495969798, it is split into [0x95969798 , 0x91929394 , 0x90] which forms our key array consisting of 32 bit integers.
+            </p>
+            <p>If initially no seed is provided ie None is used as the seed, then python uses system entropy to form the key array for the generator. This system entropy is OS dependent, for example the BCryptGenRandom() API call on Windows and /dev/urandom on Unix/Linux based systems. 624 random 32 bit integers are used to create the key array. </p>
+                
+            <p>If system entropy is unavailable for some reason, python fallbacks to using the system time and process ID (PID) for seeding. It uses current time (2 x 32 bit values), monotonic time (2 x 32 bit values) and the PID (1 x 32 bit value) for a total of <span class="highlight">160 bits of entropy in the best case, though the actual entropy is usually a lot lower.</span>
+            </p>
+            <div style="
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1a1a1a;
+    color: #00FF00;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+">
+    <div style="
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    ">
+        <div style="
+            background: #1a1a1a;
+            border: 2px solid #00FF00;
+            padding: 20px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 200px;
+            max-width: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        ">
+            <div style="
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #1a1a1a;
+                background: #00FF00;
+                padding: 10px 15px;
+                border-radius: 5px;
+                margin-bottom: 15px;
+                width: 100%;
+            ">INTEGER</div>
+            <div style="
+                font-family: 'Courier New', monospace;
+                font-size: 0.9rem;
+                color: #00FF00;
+                background: #0a0a0a;
+                padding: 10px;
+                border: 1px solid #00FF00;
+                margin-bottom: 15px;
+                border-radius: 5px;
+                width: 100%;
+                word-break: break-all;
+            ">12345</div>
+            <div style="
+                font-size: 0.85rem;
+                color: #00FF00;
+                margin-bottom: 12px;
+                line-height: 1.4;
+                text-align: center;
+                flex-grow: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            ">Used directly without modification</div>
+            <div style="
+                font-size: 0.8rem;
+                color: #00FF00;
+                background: #003300;
+                padding: 8px 10px;
+                border: 1px solid #00FF00;
+                font-family: 'Courier New', monospace;
+                margin-bottom: 12px;
+                border-radius: 5px;
+                width: 100%;
+                text-align: center;
+            ">No processing</div>
+            <div style="
+                font-size: 0.85rem;
+                color: #1a1a1a;
+                background: #00FF00;
+                padding: 10px;
+                border-radius: 5px;
+                font-weight: bold;
+                width: 100%;
+            ">32-bit integer</div>
+        </div>
+
+        <div style="
+            background: #1a1a1a;
+            border: 2px solid #00FF00;
+            padding: 20px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 200px;
+            max-width: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        ">
+            <div style="
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #1a1a1a;
+                background: #00FF00;
+                padding: 10px 15px;
+                border-radius: 5px;
+                margin-bottom: 15px;
+                width: 100%;
+            ">FLOAT</div>
+            <div style="
+                font-family: 'Courier New', monospace;
+                font-size: 0.9rem;
+                color: #00FF00;
+                background: #0a0a0a;
+                padding: 10px;
+                border: 1px solid #00FF00;
+                margin-bottom: 15px;
+                border-radius: 5px;
+                width: 100%;
+                word-break: break-all;
+            ">3.14159</div>
+            <div style="
+                font-size: 0.85rem;
+                color: #00FF00;
+                margin-bottom: 12px;
+                line-height: 1.4;
+                text-align: center;
+                flex-grow: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            ">Processed using non-cryptographic hash function</div>
+            <div style="
+                font-size: 0.8rem;
+                color: #00FF00;
+                background: #003300;
+                padding: 8px 10px;
+                border: 1px solid #00FF00;
+                font-family: 'Courier New', monospace;
+                margin-bottom: 12px;
+                border-radius: 5px;
+                width: 100%;
+                text-align: center;
+            ">hash(float)</div>
+            <div style="
+                font-size: 0.85rem;
+                color: #1a1a1a;
+                background: #00FF00;
+                padding: 10px;
+                border-radius: 5px;
+                font-weight: bold;
+                width: 100%;
+            ">32-bit integer</div>
+        </div>
+
+        <div style="
+            background: #1a1a1a;
+            border: 2px solid #00FF00;
+            padding: 20px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 200px;
+            max-width: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        ">
+            <div style="
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #1a1a1a;
+                background: #00FF00;
+                padding: 10px 15px;
+                border-radius: 5px;
+                margin-bottom: 15px;
+                width: 100%;
+            ">STRING</div>
+            <div style="
+                font-family: 'Courier New', monospace;
+                font-size: 0.9rem;
+                color: #00FF00;
+                background: #0a0a0a;
+                padding: 10px;
+                border: 1px solid #00FF00;
+                margin-bottom: 15px;
+                border-radius: 5px;
+                width: 100%;
+                word-break: break-all;
+            ">"hello"</div>
+            <div style="
+                font-size: 0.85rem;
+                color: #00FF00;
+                margin-bottom: 12px;
+                line-height: 1.4;
+                text-align: center;
+                flex-grow: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            ">SHA2-512 hash</div>
+            <div style="
+                font-size: 0.8rem;
+                color: #00FF00;
+                background: #003300;
+                padding: 8px 10px;
+                border: 1px solid #00FF00;
+                font-family: 'Courier New', monospace;
+                margin-bottom: 12px;
+                border-radius: 5px;
+                width: 100%;
+                text-align: center;
+            ">SHA2-512(string)</div>
+            <div style="
+                font-size: 0.85rem;
+                color: #1a1a1a;
+                background: #00FF00;
+                padding: 10px;
+                border-radius: 5px;
+                font-weight: bold;
+                width: 100%;
+            ">32-bit integer</div>
+        </div>
+
+        <div style="
+            background: #1a1a1a;
+            border: 2px solid #00FF00;
+            padding: 20px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 200px;
+            max-width: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        ">
+            <div style="
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #1a1a1a;
+                background: #00FF00;
+                padding: 10px 15px;
+                border-radius: 5px;
+                margin-bottom: 15px;
+                width: 100%;
+            ">BYTEARRAY</div>
+            <div style="
+                font-family: 'Courier New', monospace;
+                font-size: 0.9rem;
+                color: #00FF00;
+                background: #0a0a0a;
+                padding: 10px;
+                border: 1px solid #00FF00;
+                margin-bottom: 15px;
+                border-radius: 5px;
+                width: 100%;
+                word-break: break-all;
+            ">b'\x01\x02\x03'</div>
+            <div style="
+                font-size: 0.85rem;
+                color: #00FF00;
+                margin-bottom: 12px;
+                line-height: 1.4;
+                text-align: center;
+                flex-grow: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            ">SHA2-512 hash</div>
+            <div style="
+                font-size: 0.8rem;
+                color: #00FF00;
+                background: #003300;
+                padding: 8px 10px;
+                border: 1px solid #00FF00;
+                font-family: 'Courier New', monospace;
+                margin-bottom: 12px;
+                border-radius: 5px;
+                width: 100%;
+                text-align: center;
+            ">SHA2-512(bytes)</div>
+            <div style="
+                font-size: 0.85rem;
+                color: #1a1a1a;
+                background: #00FF00;
+                padding: 10px;
+                border-radius: 5px;
+                font-weight: bold;
+                width: 100%;
+            ">32-bit integer</div>
+        </div>
+
+        <div style="
+            background: #1a1a1a;
+            border: 2px solid #00FF00;
+            padding: 20px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 200px;
+            max-width: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        ">
+            <div style="
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #1a1a1a;
+                background: #00FF00;
+                padding: 10px 15px;
+                border-radius: 5px;
+                margin-bottom: 15px;
+                width: 100%;
+            ">NONE</div>
+            <div style="
+                font-family: 'Courier New', monospace;
+                font-size: 0.9rem;
+                color: #00FF00;
+                background: #0a0a0a;
+                padding: 10px;
+                border: 1px solid #00FF00;
+                margin-bottom: 15px;
+                border-radius: 5px;
+                width: 100%;
+                word-break: break-all;
+            ">None</div>
+            <div style="
+                font-size: 0.85rem;
+                color: #00FF00;
+                margin-bottom: 12px;
+                line-height: 1.4;
+                text-align: center;
+                flex-grow: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            ">Use system CSPRNG</div>
+            <div style="
+                font-size: 0.8rem;
+                color: #00FF00;
+                background: #003300;
+                padding: 8px 10px;
+                border: 1px solid #00FF00;
+                font-family: 'Courier New', monospace;
+                margin-bottom: 12px;
+                border-radius: 5px;
+                width: 100%;
+                text-align: center;
+            ">OS entropy source</div>
+            <div style="
+                font-size: 0.85rem;
+                color: #1a1a1a;
+                background: #00FF00;
+                padding: 10px;
+                border-radius: 5px;
+                font-weight: bold;
+                width: 100%;
+            ">624 × 32-bit array</div>
+        </div>
+    </div>
+</div>
+        <p>Once they key array is ready, the initial state is initialized using the starting constant of 19650218. This value forms the first cell of the 624 element internal state. To explain the key mixing procedure, we use the following variables:
+        </p>
+        <p>Internal state --> mt (Array of 624 elements, each element being a 32 bit integer) <br>
+            The initial state is constructed using a linear congruential relation like this:</p>
+        <div class="code-block">
+            <p>          
+mt = [0]*624
+mt[0] = 19650218;
+for i in range(1 , 624):
+    mt[i] = (1812433253 * (mt[i-1] ^ (mt[i-1] >> 30)) + i) & 0xFFFFFFFF
+            </p>
+        </div>
+        <p>
+            First ,mt is initialized as an array of 624 0s, then mt[0], the first element in the state is set to 19650218
+        </p>
+        <p>
+            Then a loop is run from 1 to 623, where each element's value is calculated as
+        </p>
+        <div class="code-block">
+            <p>          
+mt[i] = (1812433253 * (mt[i-1] ^ (mt[i-1] >> 30)) + i) & 0xFFFFFFFF <br>
+mt[i-1] is the previous element <br>
+mt[i-1] >> 30 is the previous element but bit shifted to the right 30 times <br>
+(mt[i-1] ^ (mt[i-1] >> 30)) is the previous element XORed with its bitshifted version <br>
+(1812433253 * (mt[i-1] ^ (mt[i-1] >> 30)) + i) it is then multiplied with a constant value of 1812433253 and the index value is added to it <br>
+(1812433253 * (mt[i-1] ^ (mt[i-1] >> 30)) + i) & 0xFFFFFFFF finally the value undergoes bitwise AND with 0xFFFFFFFF to ensure that it remains a 32 bit integer
+            </p>
+        </div>
+        <p>
+            After the initial state is ready, the first round of key mixing takes place. For this we make use of the following variables:
+        </p>
+        <p>Internal state --> mt (Array of 624 elements, each element being a 32 bit integer)</p>
+        <p>Key array --> k (Array of variable length, each element being a 32 bit integer)</p>
+        <p>Updated internal state --> mt2 (The internal state after mixing, array of 624 element, each element being a 32 bit integer) </p>
+        <div class="code-block">
+            <p>          
+mt2 = mt.copy()
+for i in range(1, 624):
+    j = (i - 1) % len(k)
+    mt2[i] = ((mt[i] ^ ((mt2[i-1] ^ (mt2[i-1] >> 30)) * 1664525)) + k[j] + j) & 0xFFFFFFFF
+mt = mt2.copy() #this is actually done inplace however for ease of understand we make use of two seperate arrays
+            </p>
+        </div>
+        <p>
+            mt2 is initialized as a copy of the original state, then a loop is run from index 1 to 623. <span class="highlight">The line j = (i - 1) % len(K) calculates the index modulo the length of the key array, ensuring the index remains in range. </span>
+        </p>
+        <p>
+            Each value in the updated state is calculated as
+        </p>
+        <div class="code-block">
+            <p>          
+mt2[i] = ((mt[i] ^ ((mt2[i-1] ^ (mt2[i-1] >> 30)) * 1664525)) + k[j] + j) & 0xFFFFFFFF <br>
+
+mt2[i-1] is the previous element in the updated internal state <br>
+(mt2[i-1] >> 30) is the previous element in the updated internal state but bit shifted to the right 30 times <br>
+(mt2[i-1] ^ (mt2[i-1] >> 30)) is the previous element in the updated internal state XORed with its bitshifted version <br>
+((mt2[i-1] ^ (mt2[i-1] >> 30)) * 1664525) then it is multiplied with a constant value of 1664525 <br>
+mt[i] is the corresponding element in the old internal state <br>
+(mt[i] ^ ((mt2[i-1] ^ (mt2[i-1] >> 30)) * 1664525)) it is XORed with value we obtained earlier <br>
+((mt[i] ^ ((mt2[i-1] ^ (mt2[i-1] >> 30)) * 1664525)) + k[j] + j) the corresponding key value is added to it, aswell as the key index value <br>
+mt2[i] = ((mt[i] ^ ((mt2[i-1] ^ (mt2[i-1] >> 30)) * 1664525)) + k[j] + j) & 0xFFFFFFFF finally it undergoes bitwise AND with 0xFFFFFFFF to ensure that it remains a 32 bit integer <br>
+            </p>
+        </div>
+        <p>
+            After this a second and final mixing loop takes place. For this we make use of the following variables:
+        </p>
+        <p>
+            Internal state --> mt (Array of 624 elements, each element being a 32 bit integer)
+        </p>
+        <div class="code-block">
+            <p>          
+for i in range(1, 624):
+    mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1566083941) - i) & 0xFFFFFFFF
+            </p>
+        </div>
+        <p>
+            Here a loop is run from 1 to 623, where the value of each element in the state is computed as 
+        </p>
+        <div class="code-block">
+            <p>          
+mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1566083941) - i) & 0xFFFFFFFF <br>
+
+mt[i-1] is the previous element <br>
+mt[i-1] >> 30 is the previous element but bit shifted to the right 30 times <br>
+(mt[i-1] ^ (mt[i-1] >> 30)) is the previous element XORed with its bitshifted version <br>
+((mt[i-1] ^ (mt[i-1] >> 30)) * 1566083941) then it is multiplied with a constant value of 1566083941 <br>
+(mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1566083941) - i) it is XORed with the current value of the internal state ie mt[i] and the index value is subtracted from it <br>
+(mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1566083941) - i) & 0xFFFFFFFF finally it undergoes bitwise AND with 0xFFFFFFFF to ensure that it remains a 32 bit integer <br>
+            </p>
+        </div>
+        <p>
+            Compiled initialization code
+        </p>
+        <div class="code-block">
+            <p>          
+mt = [0]*624
+mt[0] = 19650218;
+for i in range(1 , 624):
+    mt[i] = (1812433253 * (mt[i-1] ^ (mt[i-1] >> 30)) + i) & 0xFFFFFFFF
+mt2 = mt.copy()
+for i in range(1, 624):
+    j = (i - 1) % len(k)
+    mt2[i] = ((mt[i] ^ ((mt2[i-1] ^ (mt2[i-1] >> 30)) * 1664525)) + k[j] + j) & 0xFFFFFFFF
+mt = mt2.copy()
+for i in range(1, 624):
+    mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1566083941) - i) & 0xFFFFFFFF
+            </p>
+        </div>
+        <p>
+            The three constants—1812433253, 1664525, and 1566083941—originate from different sources in the literature. <span class="highlight">The first, 1812433253, is taken from Donald Knuth’s The Art of Computer Programming, Volume 2, while the other two are taken from alternative well-established sources.</span>
+        </p>
+        <p>
+            This seeding process ensures <span class="highlight">good diffusion and shows a strong avalanche effect</span>, both of which are critical properties for any high quality PRNG. The diffusion ensures that the influence of each bit of the input seed spreads across a large portion of the internal state. The avalanche effect refers to the phenomenon where even a single bit change in the input seed causes widespread and unpredictable changes in the resulting internal state.
+        </p>
+        </div>
+
+        <div class="blog-post">
+            <h2>The twist operation: Putting the magazine in the gun</h2>
+            <p><span class="highlight">The twist operation periodically refreshes the internal state of MT19937, ensuring long-term randomness.</span> The twist function ensures that new numbers are not just linear combinations of old ones. <span class="highlight">It also ensures that the output is statistically uniform across a high-dimensional space</span>, making it suitable for applications requiring high quality pseudo random numbers.
+            </p>
+            <p>To understand the twist operation, we make use of the following variables:</p>
+
+            <p>Internal state --> mt (Array of 624 elements, each element being a 32 bit integer)</p>
+
+            <div class="code-block">
+                <p>for i in range(624):
+    y = (mt[i] & 0x80000000) + (mt[(i+1) % 624] & 0x7FFFFFFF)
+    mt[i] = mt[(i + 397) % 624] ^ (y >> 1)
+    if y % 2 != 0:
+        mt[i] = mt[i] ^ 0x9908B0DF
+                </p>
+            </div>
+            <p>Here the code iterates through the internal state, and calculates an intermediate value y for all indices.</p>
+            <div class="code-block">
+                <p>y = (mt[i] & 0x80000000) + (mt[(i+1) % 624] & 0x7FFFFFFF) <br>
+
+mt[i] is the current element <br>
+mt[(i+1) % 624] is the next element with a loop around, so if mt[i] is the 624th element, mt[(i+1) % 624] wraps back to the 1st element <br>
+(mt[i] & 0x80000000) the current element undergoes bitwside AND with the constant of 0x80000000 <br> 
+(mt[(i+1) % 624] & 0x7FFFFFFF) the next element undergoes bitwise AND with the constant of 0x7FFFFFFF <br>
+(mt[i] & 0x80000000) + (mt[(i+1) % 624] & 0x7FFFFFFF) both of the values obtained above are added to obtain y <br>
+                </p>
+            </div>
+            <p>The first half of the calculation isolates the most significant bit of the current element (mt[i]) using a bitwise AND with 0x80000000. The second part isolates the lower 31 bits of the next element (mt[(i+1) % 624]) using 0x7FFFFFFF. 
+            </p>
+            <p>
+                These two values are added together to form an intermediate result y.
+            </p>
+            <p>
+                After this the current element is updated using
+            </p>
+            <div class="code-block">
+                <p>mt[i] = mt[(i + 397) % 624] ^ (y >> 1) <br>
+
+mt[(i + 397) % 624] is the next 397th element with a loop around, so if mt[i] is the 624th element, mt[(i + 397) % 624] becomes the 397th element <br>
+(y >> 1) is the previously obtained intermediate value y bitshifted to the right once <br>
+mt[(i + 397) % 624] ^ (y >> 1) both these values are XORed and then assigned to the current element
+                </p>
+            </div>
+            <p>
+                <span class="highlight">As we can see, each element in the "twisted" grid depends on three elements, the element with the same index, the element with the next index and the element located 397 positions ahead in the internal state.</span> This provides further diffusion
+            </p>
+            <p>
+                Finally, if the intermediate y was odd, which is checked by the statement y % 2 != 0, the current element in the state is updated with the XOR of itself and the constant 0x9908B0DF.
+            </p>
+            <p>
+                <span class="highlight">This final update introduces non linearity to the function and also destroys symmetry and predictability </span> which existed earlier due to the values being linear. The constant 0x9908B0DF also has a high Hamming weight ie it has many bits set, which means when it is XORed with the element, it changes many bits of the element. The constant also exhibits optimal behaviour required for a PRNG.
+            </p>
+            <p>
+                After generating 624 random numbers, the internal state is considered "exhausted" ie all the values obtained from the previous twist operation have been consumed. To continue generation more random numbers, the internal state undergoes another twist operation and it is ready to generate another batch of 624 random numbers. Think of this like reloading the gun after firing all 624 bullets.
+            </p>
+        </div>
+
+        <div class="blog-post">
+            <h2>Firing the bullets: The tempering operation and the death of any remaining linearity</h2>
+            <p>
+                To finally generate a random number, we take the nth element from the internal state. This nth counter is reset every time the twist operation is performed. To understand the temper operation in detail we make use of the following code
+            </p>
+            <div class="code-block">
+                <p>index = 0 #assume twist operation has just been called
+random_num = mt[index]
+random_num = random_num ^ (random_num >> 11)
+random_num = random_num ^ ((random_num << 7) & 0x9d2c5680)
+random_num = random_num ^ ((random_num << 15) & 0xefc60000)
+random_num = random_num ^ (random_num >> 18)
+if index == 623:
+    index = 0
+    twist()
+else:
+    index = index + 1
+                </p>
+            </div>
+            <p>
+                We start by assuming that the index is 0, ie that the twist operation was just called and the first element of the internal state is taken. Then we process it step by step:
+            </p>
+            <div class="code-block">
+                <p>random_num = random_num ^ (random_num >> 11)
+(random_num >> 11) is the variable random_num but bitshifted to the right 11 times. random_num is XORed with it and that value is used for further computations.
+                    
+random_num = random_num ^ ((random_num << 7) & 0x9d2c5680)
+(random_num << 7) is the variable random_num but bitshifted to the right 7 times. It then undergoes bitwise AND with a constant value of 0x9d2c5680 and is XORed with random_num.
+                    
+random_num = random_num ^ ((random_num << 15) & 0xefc60000)
+random_num = random_num ^ (random_num >> 18)
+                    
+In these two steps aswell, the number is bitshifted, XORed and undergoes bitwise AND with another constant
+                </p>
+            </div>
+            <p>
+                Finally we obtain our random_num, the output of a long sequence of operations that represent careful mathematical and algorithmic design. 
+            </p>
+            <p>
+                This single value is the product of a carefully initialized internal state, a well tuned recurrence relation that ensures period and statistical uniformity, a twist transformation that diffuses correlations across the internal state, and a tempering process which improves the distribution of output bits. 
+            </p>
+            <p>
+                So much just to simulate a coin toss ...
+            </p>
+        </div>
+    </div>
+</body>
+</html>
