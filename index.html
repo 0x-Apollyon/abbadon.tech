@@ -4,30 +4,12 @@
         <link rel="icon" type="image/x-icon" href="./icon.ico">
         
         <style>
-            /* --- SCROLLBAR STYLING --- */
-            * {
-                scrollbar-width: thin;
-                scrollbar-color: #333 #000;
-            }
+            * { scrollbar-width: thin; scrollbar-color: #333 #000; }
+            ::-webkit-scrollbar { width: 6px; }
+            ::-webkit-scrollbar-track { background: #050505; }
+            ::-webkit-scrollbar-thumb { background-color: #333; border-radius: 3px; }
+            ::-webkit-scrollbar-thumb:hover { background-color: #555; }
 
-            ::-webkit-scrollbar {
-                width: 6px;
-            }
-
-            ::-webkit-scrollbar-track {
-                background: #050505;
-            }
-
-            ::-webkit-scrollbar-thumb {
-                background-color: #333;
-                border-radius: 3px;
-            }
-
-            ::-webkit-scrollbar-thumb:hover {
-                background-color: #555;
-            }
-
-            /* --- CORE LAYOUT --- */
             body {
                 background-color: black;
                 color: white;
@@ -40,7 +22,6 @@
                 font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
             }
 
-            /* --- THE MAIN STAGE --- */
             #canvas-container {
                 flex-grow: 1;
                 width: 100%;
@@ -57,370 +38,211 @@
             canvas {
                 display: block;
                 image-rendering: pixelated; 
-                -webkit-font-smoothing: none;
             }
 
-            /* --- NAVIGATION LINKS (Bottom) --- */
             .nav-container {
                 height: 70px;
                 min-height: 70px;
                 display: flex;
-                /* CHANGED: This pushes items to the far left, center, and far right */
                 justify-content: space-between; 
                 align-items: center;
                 background-color: black;
                 z-index: 10;
                 flex-shrink: 0; 
-                /* We remove padding here because we will set a strict width in JS */
-                margin: 0 auto; /* Centers the container itself */
+                margin: 0 auto; 
                 border-top: 1px solid #111; 
                 box-sizing: border-box;
+                width: 0; 
+                opacity: 0; 
+                transition: opacity 0.3s ease;
             }
 
             .nav-link {
                 font-size: 11px;
                 letter-spacing: 1.5px;
                 font-weight: 500;
-                color: #666; /* Slightly darker default for more contrast on hover */
+                color: #666;
                 text-decoration: none;
                 text-transform: uppercase;
                 transition: color 0.3s ease;
-                padding: 10px 0; /* Remove side padding to align perfectly with edge */
+                padding: 10px 0; 
                 white-space: nowrap; 
             }
 
-            .nav-link:hover {
-                color: #FFF; 
-            }
-
-            /* Loading Message */
-            #loading {
-                position: absolute;
-                color: #444;
-                font-size: 20px;
-                letter-spacing: 4px;
-                pointer-events: none;
-                text-transform: uppercase;
-                animation: pulse 2s infinite;
-            }
-
-            @keyframes pulse {
-                0% { opacity: 0.4; }
-                50% { opacity: 0.8; }
-                100% { opacity: 0.4; }
-            }
-
-            /* --- MOBILE RESPONSIVENESS --- */
-            @media (max-width: 600px) {
-                .nav-link {
-                    font-size: 9px;
-                    letter-spacing: 0.5px;
-                }
-            }
+            .nav-link:hover { color: #FFF; }
         </style>
     </head>
     <body>
 
-        <!-- THE MAIN ASCII ART CANVAS -->
         <div id="canvas-container">
-            <div id="loading">Good things take time. A lot of time sometimes .....</div>
             <canvas id="ascii-canvas"></canvas>
         </div>
 
-        <!-- THE NAVIGATION LINKS -->
         <div class="nav-container">
-            <!-- Note: justify-content: space-between puts this on the far left -->
             <a href="./blog/index.html" class="nav-link">Blog & Research</a>
-            
-            <!-- This stays in the center -->
             <a href="./projects/index.html" class="nav-link">Projects</a>
-            
-            <!-- This goes to the far right -->
             <a href="./contact/index.html" class="nav-link">Contact</a>
         </div>
 
+<script src="./ascii_data.js"></script>
+
 <script>
-    /**
-     * CONFIGURATION
-     */
     const canvas = document.getElementById('ascii-canvas');
     const ctx = canvas.getContext('2d');
-    const loadingText = document.getElementById('loading');
     const container = document.getElementById('canvas-container');
-    // We need the nav container to manipulate its width
     const navContainer = document.querySelector('.nav-container');
-    
-    const density = '@#W$9876543210?!abc;:+=-,._                    '; 
-    
-    let fontSize = 10;
+
     let flashlightRadius = 150;
-    
-    let imageCoordinates = [];
-    let imgBounds = { x: 0, y: 0, w: 0, h: 0 };
-    
     let mouse = { x: -1000, y: -1000 };
     let isColorLocked = false;
-    let resizeTimeout;
+    let currentDrawBounds = { x:0, y:0, w:0, h:0 }; 
 
-    const image = new Image();
-    image.src = "./girl_with_pearl.jpg";
+    handleResize();
+    window.requestAnimationFrame(loop);
 
-    image.onload = function() {
-        loadingText.style.display = 'none';
-        initAscii();
-    };
-
-
-    function handleInteraction(clientX, clientY) {
-        const rect = canvas.getBoundingClientRect();
-        const localX = clientX - rect.left;
-        const localY = clientY - rect.top;
+    function handleResize() {
+        const w = container.clientWidth;
+        const h = container.clientHeight;
         
-        mouse.x = localX;
-        mouse.y = localY;
+        if (w === 0 || h === 0) return;
 
-        //cursor feedback
-        if (localX >= imgBounds.x && localX <= imgBounds.x + imgBounds.w &&
-            localY >= imgBounds.y && localY <= imgBounds.y + imgBounds.h) {
-            container.style.cursor = 'pointer';
+        canvas.width = w;
+        canvas.height = h;
+
+        flashlightRadius = Math.min(w, h) * 0.15;
+        if (flashlightRadius < 80) flashlightRadius = 80;
+
+        const screenAspect = w / h;
+        let drawW, drawH;
+
+        const aspect = (typeof IMG_ASPECT_RATIO !== 'undefined') ? IMG_ASPECT_RATIO : 1;
+
+        if (aspect > screenAspect) {
+            drawW = w;
+            drawH = w / aspect;
         } else {
-            container.style.cursor = 'default';
+            drawH = h;
+            drawW = h * aspect;
         }
-        
-        return { x: localX, y: localY };
+
+        const offX = (w - drawW) / 2;
+        const offY = (h - drawH) / 2;
+
+        currentDrawBounds = { x: offX, y: offY, w: drawW, h: drawH };
+
+        navContainer.style.width = `${drawW}px`;
+        navContainer.style.opacity = '1';
+
+        ctx.font = 'bold ' + (drawW / 100) + 'px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
+        ctx.textBaseline = 'top';
     }
 
-    container.addEventListener('mousemove', function(e) {
-        handleInteraction(e.clientX, e.clientY);
-    });
+    function loop() {
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    container.addEventListener('click', function(e) {
-        const pos = handleInteraction(e.clientX, e.clientY);
+        const radSq = flashlightRadius * flashlightRadius;
         
-        //click only in image area
-        if (pos.x >= imgBounds.x && pos.x <= imgBounds.x + imgBounds.w &&
-            pos.y >= imgBounds.y && pos.y <= imgBounds.y + imgBounds.h) {
+        if (typeof PRECOMPUTED_DATA !== 'undefined') {
+            const len = PRECOMPUTED_DATA.length;
+            
+            for (let i = 0; i < len; i++) {
+                const p = PRECOMPUTED_DATA[i];
+                
+                const u = p[0];
+                const v = p[1];
+                const char = p[2];
+                
+                const px = currentDrawBounds.x + (u * currentDrawBounds.w);
+                const py = currentDrawBounds.y + (v * currentDrawBounds.h);
+
+                if (isColorLocked) {
+                    ctx.fillStyle = `rgb(${p[3]},${p[4]},${p[5]})`;
+                } else {
+                    const dx = px - mouse.x;
+                    const dy = py - mouse.y;
+                    
+                    if ((dx*dx + dy*dy) < radSq) {
+                        ctx.fillStyle = `rgb(${p[3]},${p[4]},${p[5]})`;
+                    } else {
+                        ctx.fillStyle = '#222'; 
+                    }
+                }
+                ctx.fillText(char, px, py);
+            }
+        }
+
+        requestAnimationFrame(loop);
+    }
+
+    function updateMouse(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        const lx = clientX - rect.left;
+        const ly = clientY - rect.top;
+        mouse.x = lx;
+        mouse.y = ly;
+
+        const inside = lx >= currentDrawBounds.x && lx <= currentDrawBounds.x + currentDrawBounds.w &&
+                       ly >= currentDrawBounds.y && ly <= currentDrawBounds.y + currentDrawBounds.h;
+        
+        container.style.cursor = inside ? 'pointer' : 'default';
+        return inside;
+    }
+
+    container.addEventListener('mousemove', e => updateMouse(e.clientX, e.clientY));
+    
+    container.addEventListener('click', e => {
+        if (updateMouse(e.clientX, e.clientY)) {
             isColorLocked = !isColorLocked;
         }
     });
 
-    container.addEventListener('mouseleave', function() {
+    container.addEventListener('mouseleave', () => {
         mouse.x = -1000;
         mouse.y = -1000;
         container.style.cursor = 'default';
     });
 
-    container.addEventListener('touchstart', function(e) {
-        const touch = e.touches[0];
-        handleInteraction(touch.clientX, touch.clientY);
-    }, {passive: true});
+    container.addEventListener('touchstart', e => updateMouse(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
+    container.addEventListener('touchmove', e => updateMouse(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
 
-    container.addEventListener('touchmove', function(e) {
-        const touch = e.touches[0];
-        handleInteraction(touch.clientX, touch.clientY);
-    }, {passive: true});
+    window.addEventListener('resize', handleResize);
 
 
-    //core
-
-    function initAscii() {
-        const w = container.clientWidth;
-        const h = container.clientHeight;
-        canvas.width = w;
-        canvas.height = h;
-
-        const targetColumns = 110; 
-        fontSize = Math.floor(w / targetColumns);
-        if (fontSize < 6) fontSize = 6;
-        if (fontSize > 14) fontSize = 14; 
-
-        flashlightRadius = Math.min(w, h) * 0.15;
-        if (flashlightRadius < 80) flashlightRadius = 80;
-
-        const aspectImg = image.width / image.height;
-        const aspectCan = w / h;
-        
-        let drawWidth, drawHeight;
-
-        if (aspectImg > aspectCan) {
-            drawWidth = w;
-            drawHeight = w / aspectImg;
-        } else {
-            drawHeight = h;
-            drawWidth = h * aspectImg;
-        }
-
-
-        navContainer.style.width = `${drawWidth}px`;
-
-        const offCanvas = document.createElement('canvas');
-        const offCtx = offCanvas.getContext('2d');
-        
-        const cols = Math.floor(drawWidth / fontSize);
-        const rows = Math.floor(drawHeight / fontSize);
-
-        offCanvas.width = cols;
-        offCanvas.height = rows;
-
-        offCtx.drawImage(image, 0, 0, cols, rows);
-        const imageData = offCtx.getImageData(0, 0, cols, rows).data;
-
-        imageCoordinates = [];
-
-        const offsetX = (w - (cols * fontSize)) / 2;
-        const offsetY = (h - (rows * fontSize)) / 2;
-
-        imgBounds = {
-            x: offsetX,
-            y: offsetY,
-            w: cols * fontSize,
-            h: rows * fontSize
-        };
-
-        for (let y = 0; y < rows; y++) {
-            for (let x = 0; x < cols; x++) {
-                const index = (y * cols + x) * 4;
-                const r = imageData[index];
-                const g = imageData[index + 1];
-                const b = imageData[index + 2];
-                const a = imageData[index + 3];
-
-                if (a > 120) { 
-                    const brightness = (r + g + b) / 3;
-                    const charIndex = Math.floor(map(brightness, 0, 255, density.length - 1, 0));
-                    const char = density.charAt(charIndex);
-
-                    imageCoordinates.push({
-                        x: x * fontSize + offsetX,
-                        y: y * fontSize + offsetY,
-                        char: char,
-                        color: `rgb(${r},${g},${b})`
-                    });
-                }
-            }
-        }
-
-        if (!window.animationRunning) {
-            window.animationRunning = true;
-            animate();
-        }
-    }
-
-    function animate() {
-        ctx.fillStyle = 'black';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.font = 'bold ' + fontSize + 'px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
-        ctx.textBaseline = 'top';
-
-        for (let i = 0; i < imageCoordinates.length; i++) {
-            const point = imageCoordinates[i];
-
-            if (isColorLocked) {
-                ctx.fillStyle = point.color;
-            } else {
-                const dx = point.x - mouse.x;
-                const dy = point.y - mouse.y;
-                const distSq = dx*dx + dy*dy;
-                const radSq = flashlightRadius * flashlightRadius;
-
-                if (distSq < radSq) {
-                    ctx.fillStyle = point.color;
-                } else {
-                    ctx.fillStyle = '#222'; 
-                }
-            }
-
-            ctx.fillText(point.char, point.x, point.y);
-        }
-
-        requestAnimationFrame(animate);
-    }
-
-    function map(value, start1, stop1, start2, stop2) {
-        return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
-    }
-
-    window.addEventListener('resize', function() {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(function() {
-            initAscii();
-        }, 150);
-    });
-
-</script>
-
-<script>
+    
     const originalTitle = document.title;
-    const originalFavicon = document.querySelector("link[rel='icon']").href;
+    let faviconLink = document.querySelector("link[rel~='icon']");
+    
+    if (!faviconLink) {
+        faviconLink = document.createElement('link');
+        faviconLink.rel = 'icon';
+        document.head.appendChild(faviconLink);
+    }
+    
+    const originalFavicon = faviconLink.href;
 
     const tabDisguises = [
-        {
-            title: "Inbox (13) - Gmail",
-            favicon: "gmail_favicon.png"
-        },
-        {
-            title: "GitHub",
-            favicon: "github_icon.png"
-        },
-        {
-            title: "(2) Discord | Friends",
-            favicon: "discord_icon.png"
-        },
-        {
-            title: "Home / X",
-            favicon: "x_favicon.png"
-        },
-        {
-            title: "ChatGPT",
-            favicon: "chatgpt_favicon.png"
-        },
-        {
-            title: "Claude",
-            favicon: "claude_icon.png"
-        },
-        {
-            title: "Welcome to fbi.gov - FBI",
-            favicon: "fbi_favicon.png"
-        },
-        {
-            title: "We are the nations first line of defense - CIA",
-            favicon: "cia_favicon.png"
-        }
+        { title: "Inbox (13) - Gmail", favicon: "gmail_favicon.png" },
+        { title: "GitHub", favicon: "github_icon.png" },
+        { title: "(2) Discord | Friends", favicon: "discord_icon.png" },
+        { title: "Home / X", favicon: "x_favicon.png" },
+        { title: "ChatGPT", favicon: "chatgpt_favicon.png" },
+        { title: "Claude", favicon: "claude_icon.png" },
+        { title: "Welcome to fbi.gov - FBI", favicon: "fbi_favicon.png" },
+        { title: "We are the nations first line of defense - CIA", favicon: "cia_favicon.png" }
     ];
 
     document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
-            const randomIndex = Math.floor(Math.random() * tabDisguises.length);
-            const selectedDisguise = tabDisguises[randomIndex];
-            
-            document.title = selectedDisguise.title;
-            
-            const currentFavicon = document.querySelector("link[rel='icon']");
-            if (currentFavicon) {
-                document.head.removeChild(currentFavicon);
-            }
-            
-            const newFavicon = document.createElement('link');
-            newFavicon.rel = 'icon';
-            newFavicon.type = 'image/x-icon';
-            newFavicon.href = selectedDisguise.favicon;
-            document.head.appendChild(newFavicon);
+            const random = tabDisguises[Math.floor(Math.random() * tabDisguises.length)];
+            document.title = random.title;
+            faviconLink.href = random.favicon;
         } else {
             document.title = originalTitle;
-            
-            const currentFavicon = document.querySelector("link[rel='icon']");
-            if (currentFavicon) {
-                document.head.removeChild(currentFavicon);
-            }
-            
-            const restoreFavicon = document.createElement('link');
-            restoreFavicon.rel = 'icon';
-            restoreFavicon.type = 'image/x-icon';
-            restoreFavicon.href = originalFavicon;
-            document.head.appendChild(restoreFavicon);
+            faviconLink.href = originalFavicon;
         }
     });
+
 </script>
 </body>
 </html>
