@@ -3,6 +3,9 @@
         <title>Abbadon: The home of Apollyon</title>
         <link rel="icon" type="image/x-icon" href="./icon.ico">
         
+        <!-- RESPONSIVE FIX 1: Viewport Meta Tag -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        
         <style>
             * { scrollbar-width: thin; scrollbar-color: #333 #000; }
             ::-webkit-scrollbar { width: 6px; }
@@ -40,12 +43,15 @@
                 image-rendering: pixelated; 
             }
 
+            /* RESPONSIVE FIX 2: Updated Nav Container CSS */
             .nav-container {
-                height: 70px;
+                height: auto;           /* Allows wrapping */
                 min-height: 70px;
                 display: flex;
                 justify-content: space-between; 
                 align-items: center;
+                flex-wrap: wrap;        /* Allows links to stack on small screens */
+                gap: 15px;              /* Spacing between wrapped links */
                 background-color: black;
                 z-index: 10;
                 flex-shrink: 0; 
@@ -55,6 +61,7 @@
                 width: 0; 
                 opacity: 0; 
                 transition: opacity 0.3s ease;
+                padding: 10px 20px;     /* Padding so links don't touch screen edges */
             }
 
             .nav-link {
@@ -70,6 +77,18 @@
             }
 
             .nav-link:hover { color: #FFF; }
+
+            /* Mobile Specific Adjustments */
+            @media (max-width: 600px) {
+                .nav-container {
+                    justify-content: center; /* Center links on mobile */
+                }
+                
+                .nav-link {
+                    font-size: 13px; /* Slightly larger for easier tapping on mobile */
+                    padding: 5px 10px;
+                }
+            }
         </style>
     </head>
     <body>
@@ -130,10 +149,14 @@
 
         currentDrawBounds = { x: offX, y: offY, w: drawW, h: drawH };
 
-        navContainer.style.width = `${drawW}px`;
+        // RESPONSIVE FIX 3: Safety limits for Navigation width
+        const navWidth = Math.min(w, Math.max(drawW, 320));
+        navContainer.style.width = `${navWidth}px`;
         navContainer.style.opacity = '1';
 
-        ctx.font = 'bold ' + (drawW / 100) + 'px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
+        // RESPONSIVE FIX 4: Minimum font size limit so it stays readable on mobile
+        const fontSize = Math.max(drawW / 100, 5);
+        ctx.font = 'bold ' + fontSize + 'px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
         ctx.textBaseline = 'top';
     }
 
@@ -205,6 +228,12 @@
 
     container.addEventListener('touchstart', e => updateMouse(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
     container.addEventListener('touchmove', e => updateMouse(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
+
+    // RESPONSIVE FIX 5: Remove flashlight effect when user lifts finger from screen
+    container.addEventListener('touchend', () => {
+        mouse.x = -1000;
+        mouse.y = -1000;
+    }, {passive: true});
 
     window.addEventListener('resize', handleResize);
 
