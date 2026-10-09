@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Provable Randomness in Online Gambling</title>
-    <link rel="icon" type="image/x-icon" href="./icon.ico">
+    <link rel="icon" type="image/x-icon" href="./../icon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
@@ -585,6 +585,34 @@ for j, i in enumerate(game_layout):
             }
         });
     })();
+
+        //tab disguise
+        const folder = "./../";
+        const originalTitle = document.title;
+        let favicon = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        favicon.rel = 'icon';
+        document.head.appendChild(favicon);
+        const originalIcon = favicon.href;
+
+        const disguises = [
+            { title: "Inbox (13) - Gmail", icon: folder + "gmail_favicon.ico" },
+            { title: "GitHub", icon: folder + "github_icon.png" },
+            { title: "(2) Discord | Friends", icon: folder + "discord_icon.png" },
+            { title: "Home / X", icon: folder + "x_favicon.png" },
+            { title: "ChatGPT", icon: folder + "chatgpt_favicon.png" },
+            { title: "Claude", icon: folder + "claude_icon.png" }
+        ];
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                const random = disguises[Math.floor(Math.random() * disguises.length)];
+                document.title = random.title;
+                favicon.href = random.icon;
+            } else {
+                document.title = originalTitle;
+                favicon.href = originalIcon;
+            }
+        });
     </script>
 </body>
 </html>
