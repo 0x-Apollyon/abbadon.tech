@@ -67,6 +67,7 @@
             left: 0;
             width: 100%;
             z-index: 100;
+            /* Solid background so scrolling text disappears instantly behind it */
             background-color: #060608;
             border-bottom: 1px solid var(--border);
         }
@@ -135,7 +136,7 @@
             font-family: 'Press Start 2P', monospace;
             font-size: clamp(16px, 4.2vw, 24px);
             line-height: 1.6;
-            margin: 0 0 56px; 
+            margin: 0 0 32px; 
             color: #ffffff; 
             text-shadow: 0 4px 8px rgba(0,0,0,0.8);
             text-align: left; 
@@ -147,6 +148,29 @@
             height: 20px; 
             margin-top: 18px;
             background: var(--chalk-line) left center no-repeat; 
+        }
+
+        /* --- RESPONSIVE HERO IMAGE & CAPTION --- */
+        .hero-figure {
+            margin: 0 0 56px 0;
+            padding: 0;
+            display: block;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 0;
+            border: none;
+            background-color: #000;
+        }
+
+        .hero-caption {
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--muted);
+            text-align: center;
         }
 
         .blog-post h2 {
@@ -209,7 +233,7 @@
         
         .blog-post p { margin: 0 0 18px; }
         
-        /* Inline and block highlights adapted for the new style */
+        /* Inline and block highlights */
         span.highlight { color: var(--head); font-weight: 600; text-shadow: 0 1px 1px #000; }
         div.highlight { 
             color: var(--head); 
@@ -223,7 +247,8 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
         
-        code {
+        /* Restrict styling specifically to inline code to avoid clashing with highlight.js */
+        :not(pre) > code {
             background: rgba(255, 255, 255, 0.06);
             padding: 2px 6px;
             border-radius: 4px;
@@ -337,29 +362,6 @@
             .content { padding: 160px 16px 72px; }
             .hljs { font-size: 12px; padding: 14px !important; }
         }
-
-        /* --- RESPONSIVE HERO IMAGE & CAPTION --- */
-        .hero-figure {
-            margin: 0 0 56px 0; /* Margin moved here from the image */
-            padding: 0;
-            display: block;
-        }
-
-        .hero-image {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 0; /* Changed from 8px to 0 (or just delete the line entirely) */
-            border: none;     /* Removed the border so the edges blend completely */
-            background-color: #000;
-        }
-
-        .hero-caption {
-            margin-top: 12px;
-            font-size: 13px;
-            color: var(--muted);
-            text-align: center;
-        }
     </style>
 </head>
 <body>
@@ -367,11 +369,11 @@
     <!-- FIXED TOP NAVBAR -->
     <div class="top-bar">
         <nav class="navbar">
-            <a href="index.html" class="nav-brand">Letters from Abbadon</a>
+            <a href="https://abbadon.tech/blog/" class="nav-brand">Letters from Abbadon</a>
             <div class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="#">Projects</a>
-                <a href="#">Contact</a>
+                <a href="https://abbadon.tech">Home</a>
+                <a href="https://abbadon.tech/projects">Projects</a>
+                <a href="https://abbadon.tech/contact/">Contact</a>
             </div>
         </nav>
     </div>
