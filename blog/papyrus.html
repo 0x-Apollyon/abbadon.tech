@@ -7,6 +7,7 @@
     <link rel="icon" type="image/x-icon" href="./../icon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="alternate" type="text/markdown" href="papyrus.md" title="Markdown version of Papyrus Obfuscation Framework">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     
     <!-- Highlight.js for Syntax Highlighting -->
@@ -379,10 +380,17 @@
     </div>
 
     <div class="content">
-        <!-- REFINED BACK BUTTON -->
-        <a href="index.html" class="home-button">
+    <!-- REFINED BACK BUTTON & AI MARKDOWN LINK -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <a href="index.html" class="home-button" style="margin-bottom: 0;">
             <span>&larr;</span> read something else
         </a>
+        
+        <a href="papyrus.md" type="text/markdown" target="_blank" class="home-button" style="margin-bottom: 0;" aria-label="Read raw Markdown format">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            .md for AI
+        </a>
+    </div>
 
         <div class="blog-title">Papyrus - A python obfuscation, evasion and anti analysis framework</div>
         <!-- IMAGE AND CAPTION WITH <figure> -->
