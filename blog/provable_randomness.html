@@ -229,6 +229,16 @@
         a:hover { color: var(--accent); }
         :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
+        /* Restrict styling specifically to inline code to avoid clashing with highlight.js */
+        :not(pre) > code {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', Consolas, monospace;
+            font-size: 13.5px;
+            color: var(--head);
+        }
+
         /* CLEAN, BLENDED CODE BLOCK STYLING */
         .code-wrap {
             position: relative;
@@ -340,7 +350,7 @@
             <h2 id="code-implementation">Code Implementation<a href="#code-implementation" class="anchor-link" aria-label="Link to Code Implementation">#</a></h2>
             <p>We'll be designing a game of Mines where the grid is of size n*n and has m mines. For this example, we'll consider a grid of size 3*3 with 1 mine, but you can tweak these parameters as needed.</p>
 
-            <pre class="code-block"><code class="language-python"># Game Configuration
+            <pre class="code-block"><code class="language-python"><script type="text/plain"># Game Configuration
 square_size = 3
 number_of_mines = 1
 number_of_tiles = square_size * square_size
@@ -361,23 +371,23 @@ for i in range(number_of_mines):
 for i in range(number_of_gems):
     game_layout.append(0)
 
-# game_layout is an array with 1s (mines) and 0s (gems)</code></pre>
+# game_layout is an array with 1s (mines) and 0s (gems)</script></code></pre>
 
             <h2 id="adding-randomness">Adding Randomness<a href="#adding-randomness" class="anchor-link" aria-label="Link to Adding Randomness">#</a></h2>
             <p>We'll use Python's random module and the os module for generating cryptographically secure randomness:</p>
 
-            <pre class="code-block"><code class="language-python">import random
+            <pre class="code-block"><code class="language-python"><script type="text/plain">import random
 import os
 
 # Generate cryptographically random server seed
 server_seed = os.urandom(32)
 random.seed(server_seed)
-random.shuffle(game_layout)</code></pre>
+random.shuffle(game_layout)</script></code></pre>
 
             <h2 id="enhanced-randomness">Enhanced Randomness with Client Seed<a href="#enhanced-randomness" class="anchor-link" aria-label="Link to Enhanced Randomness">#</a></h2>
             <p>To prevent manipulation, we incorporate a client-side seed:</p>
 
-            <pre class="code-block"><code class="language-python">import random
+            <pre class="code-block"><code class="language-python"><script type="text/plain">import random
 import os
 import hashlib
 
@@ -397,10 +407,10 @@ final_seed = client_seed_hashed + server_seed
 
 # Shuffle game layout
 random.seed(final_seed)
-random.shuffle(game_layout)</code></pre>
+random.shuffle(game_layout)</script></code></pre>
 
             <h2 id="game-logic">Game Logic and State Management<a href="#game-logic" class="anchor-link" aria-label="Link to Game Logic">#</a></h2>
-            <pre class="code-block"><code class="language-python"># Convert 1D layout to 2D grid
+            <pre class="code-block"><code class="language-python"><script type="text/plain"># Convert 1D layout to 2D grid
 square_layout = []
 square_row = []
 for j, i in enumerate(game_layout):
@@ -447,10 +457,10 @@ while not mine_struck:
     else:
         print("Game ended")
         print(f"Client seed for verification: {server_seed}")
-        mine_struck = True</code></pre>
+        mine_struck = True</script></code></pre>
 
             <h2 id="client-side-verification">Client-Side Verification<a href="#client-side-verification" class="anchor-link" aria-label="Link to Client-Side Verification">#</a></h2>
-            <pre class="code-block"><code class="language-python"># Verification Script
+            <pre class="code-block"><code class="language-python"><script type="text/plain"># Verification Script
 square_size = 3
 number_of_mines = 1
 number_of_tiles = square_size * square_size
@@ -493,7 +503,7 @@ for j, i in enumerate(game_layout):
         print("   MINE  ", end="")
 
     if (j+1) % square_size == 0:
-        print()</code></pre>
+        print()</script></code></pre>
 
             <h2 id="conclusion">Conclusion<a href="#conclusion" class="anchor-link" aria-label="Link to Conclusion">#</a></h2>
             <p>This is a fundamental example using the game Mines, but the principles of provable randomness can be applied to all types of gambling games.</p>
@@ -503,18 +513,30 @@ for j, i in enumerate(game_layout):
     </div>
 
     <script>
-    // Initialize Highlight.js
-    hljs.highlightAll();
+    /* Using DOMContentLoaded ensures scripts fire predictably even on minified servers / CDNs */
+    document.addEventListener("DOMContentLoaded", (event) => {
+        
+        /* Safely extract raw unescaped code from script templates */
+        document.querySelectorAll('pre.code-block code').forEach(function(code) {
+            var rawData = code.querySelector('script[type="text/plain"]');
+            if (rawData) {
+                code.textContent = rawData.textContent.trim(); /* Extracts code safely ignoring < and > */
+            }
+        });
 
-    (function () {
+        /* Initialize Highlight.js */
+        if (typeof hljs !== 'undefined') {
+            hljs.highlightAll();
+        }
+
         var svg24 = function (d) {
             return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
         };
         var ICON = {
-            // Standard overlapping rectangles copy icon
+            /* Standard overlapping rectangles copy icon */
             copy: svg24('<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>'),
             check: svg24('<polyline points="20 6 9 17 4 12"></polyline>'),
-            fold: svg24('<polyline points="18 15 12 9 6 15"></polyline>') // Chevron arrow up
+            fold: svg24('<polyline points="18 15 12 9 6 15"></polyline>') /* Chevron arrow up */
         };
         
         function button(cls, label, icon) {
@@ -529,6 +551,8 @@ for j, i in enumerate(game_layout):
 
         document.querySelectorAll('pre.code-block').forEach(function (pre, i) {
             var code = pre.querySelector('code');
+            if (!code) return; /* Prevent crashes if DOM got minified weirdly */
+
             var lines = code.textContent.split('\n').length;
             var wrap = document.createElement('div');
             wrap.className = 'code-wrap';
@@ -584,9 +608,8 @@ for j, i in enumerate(game_layout):
                 wrap.appendChild(foot);
             }
         });
-    })();
 
-        //tab disguise
+        /* tab disguise */
         const folder = "./../";
         const originalTitle = document.title;
         let favicon = document.querySelector("link[rel*='icon']") || document.createElement('link');
@@ -613,6 +636,7 @@ for j, i in enumerate(game_layout):
                 favicon.href = originalIcon;
             }
         });
+    });
     </script>
 </body>
 </html>
