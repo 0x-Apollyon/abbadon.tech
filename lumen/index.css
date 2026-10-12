@@ -351,3 +351,18 @@ p:last-child{
 		transform:rotate(30deg) translate(0,0)
 }
 }
+
+table {
+	width: 100%;
+	margin-top: 15px;
+	text-align: center;
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+
+th, td {
+	word-break: break-word;
+	overflow-wrap: anywhere;
+	vertical-align: middle;
+}
+
