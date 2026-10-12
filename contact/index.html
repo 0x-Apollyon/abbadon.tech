@@ -9,6 +9,29 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=VT323&display=swap" rel="stylesheet">
 
+<meta name="description" content="Contact Apollyon (0xApollyon) / Aditya Manuja. Social links, email addresses, and the official PGP public key for encrypted communication.">
+<meta name="author" content="Apollyon">
+<link rel="canonical" href="https://abbadon.tech/contact/">
+
+<meta property="og:site_name" content="Emissaries of Abbadon">
+<meta property="og:type" content="profile">
+<meta property="og:url" content="https://abbadon.tech/contact/">
+<meta property="og:title" content="Contact Apollyon | Secure Comms & PGP">
+<meta property="og:description" content="Connect with Apollyon via GitHub, Twitter, Discord, or secure encrypted email.">
+<meta property="og:image" content="https://abbadon.tech/embed-banner.png">
+<meta property="og:image:alt" content="Terminal interface for contacting Apollyon">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@0xApollyon">
+<meta name="twitter:creator" content="@0xApollyon">
+<meta name="twitter:url" content="https://abbadon.tech/contact/">
+<meta name="twitter:title" content="Contact Apollyon | Secure Comms & PGP">
+<meta name="twitter:description" content="Connect with Apollyon via GitHub, Twitter, Discord, or secure encrypted email.">
+<meta name="twitter:image" content="https://abbadon.tech/embed-banner.png">
+<meta name="twitter:image:alt" content="Terminal interface for contacting Apollyon">
+
+<meta name="theme-color" content="#ffffff">
+
 <style>
     :root {
         --bg: #000000;
@@ -226,12 +249,42 @@
         .page-title { margin-bottom: 2rem; font-size: 3rem; }
     }
 </style>
+
+<!-- AI SEO: Knowledge Graph Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "ContactPage",
+          "@id": "https://abbadon.tech/contact/#webpage",
+          "url": "https://abbadon.tech/contact/",
+          "name": "Contact Apollyon",
+          "description": "Contact information, social media profiles, and PGP public key for Apollyon."
+        },
+        {
+          "@type": "Person",
+          "@id": "https://abbadon.tech/#person",
+          "name": "Apollyon",
+          "alternateName": ["0xApollyon", "0x-Apollyon", "0xapollyon"],
+          "url": "https://abbadon.tech",
+          "sameAs": [
+            "https://twitter.com/0xApollyon",
+            "https://github.com/0x-Apollyon"
+          ],
+          "email": "apollyon@abbadon.tech",
+          "description": "Cybersecurity researcher, malware developer, and technical writer."
+        }
+      ]
+    }
+    </script>
+
 </head>
 <body>
 
 <!-- FIXED NAV -->
 <div class="top-bar">
-    <nav class="navbar">
+    <nav class="navbar" aria-label="Main menu">
         <a href="https://abbadon.tech/contact" class="nav-brand">Emissaries of Abbadon</a>
         <div class="nav-links">
             <a href="https://abbadon.tech">Home</a>
@@ -246,23 +299,38 @@
 <div class="scanlines"></div>
 
 <!-- CONTENT -->
-<main class="page-content">
+<main class="page-content" aria-label="Contact Information">
     <h1 class="page-title">Contact Info</h1>
 
     <div class="contact-grid">
         <!-- Socials Card -->
         <div class="card">
             <h2 class="card-title">Find Me Online</h2>
-            <a href="https://github.com/0x-Apollyon" target="_blank" class="social-link">- GitHub: 0x-Apollyon</a>
-            <a href="https://twitter.com/0xApollyon" target="_blank" class="social-link">- Twitter: 0xApollyon</a>
-            <div class="social-link" style="cursor: default;">- Discord: 0xapollyon</div>
-            <a href="mailto:adityamanuja928@gmail.com" class="social-link">- Mail: apollyon@abbadon.tech</a>
-            <a href="mailto:oaxplyn@cock.li" class="social-link">- Mail: oaxplyn@cock.li</a>
+            
+            <a href="https://github.com/0x-Apollyon" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Visit Apollyon's GitHub Profile">
+                - GitHub: 0x-Apollyon
+            </a>
+            
+            <a href="https://twitter.com/0xApollyon" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Visit Apollyon's Twitter Profile">
+                - Twitter: 0xApollyon
+            </a>
+            
+            <div class="social-link" style="cursor: default;" role="text" aria-label="Discord Username: 0xapollyon">
+                - Discord: 0xapollyon
+            </div>
+            
+            <a href="mailto:apollyon@abbadon.tech" class="social-link" aria-label="Send an email to Apollyon via standard mail">
+                - Mail: apollyon@abbadon.tech
+            </a>
+            
+            <a href="mailto:oaxplyn@cock.li" class="social-link" aria-label="Send an email to Apollyon via Cock.li">
+                - Mail: oaxplyn@cock.li
+            </a>
         </div>
 
         <!-- PGP Card -->
         <div class="card">
-            <h2 class="card-title">PGP Public Key</h2>
+            <button class="copy-button" onclick="copyPGPKey()" aria-live="polite" aria-label="Copy PGP Public Key to clipboard">[ Copy Key ]</button>
             <div class="pgp-block" id="pgp-key">-----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mDMEZ703nhYJKwYBBAHaRw8BAQdAhrDldyGzBoVpW9qNJDok0On7j0EKMAkG2kGC
