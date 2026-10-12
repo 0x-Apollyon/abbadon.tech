@@ -10,6 +10,28 @@
     <link rel="alternate" type="text/markdown" href="papyrus.md" title="Markdown version of Papyrus Obfuscation Framework">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     
+    <meta name="description" content="A deep dive into Papyrus: A Python obfuscation, evasion, and anti-analysis framework which uses AST modification, cryptography, and polymorphism to cloak payloads.">
+    <meta name="author" content="Abbadon">
+
+    <meta property="og:site_name" content="Letters from Abbadon">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://abbadon.tech/blog/papyrus.html">
+    <meta property="og:title" content="Papyrus - Python Obfuscation & Evasion Framework">
+    <meta name="og:description" content="A deep dive into Papyrus: A Python obfuscation, evasion, and anti-analysis framework which uses AST modification, cryptography, and polymorphism to cloak payloads.">
+    <meta property="og:image" content="https://abbadon.tech/blog/unlight.png">
+    <meta property="og:image:alt" content="Ungoliant's unlight cloaking and obfuscating Melkor">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@0xApollyon">
+    <meta name="twitter:creator" content="@0xApollyon">
+    <meta name="twitter:url" content="https://abbadon.tech/blog/papyrus.html">
+    <meta name="twitter:title" content="Papyrus - Python Obfuscation & Evasion Framework">
+    <meta name="twitter:description" content="A deep dive into Papyrus: A Python obfuscation, evasion, and anti-analysis framework which uses AST modification, cryptography, and polymorphism to cloak payloads.">
+    <meta name="twitter:image" content="https://abbadon.tech/blog/unlight.png">
+    <meta name="twitter:image:alt" content="Ungoliant's unlight cloaking and obfuscating Melkor">
+
+    <meta name="theme-color" content="#ffffff">
+    
     <!-- Highlight.js for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -398,7 +420,7 @@
 
     <!-- FIXED TOP NAVBAR -->
     <div class="top-bar">
-        <nav class="navbar">
+        <nav class="navbar" aria-label="Main menu">
             <a href="https://abbadon.tech/blog/" class="nav-brand">Letters from Abbadon</a>
             <div class="nav-links">
                 <a href="https://abbadon.tech">Home</a>
@@ -408,11 +430,11 @@
         </nav>
     </div>
 
-    <div class="content">
+    <main class="content" aria-label="Blog post content">
     <!-- REFINED BACK BUTTON & AI MARKDOWN LINK -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-        <a href="index.html" class="home-button" style="margin-bottom: 0;">
-            <span>&larr;</span> read something else
+        <a href="index.html" class="home-button" style="margin-bottom: 0;" aria-label="Return to blog index">
+            <span aria-hidden="true">&larr;</span> read something else
         </a>
         
         <a href="papyrus.md" type="text/markdown" target="_blank" class="home-button" style="margin-bottom: 0;" aria-label="Read raw Markdown format">
@@ -633,7 +655,7 @@ else:
 
         <div class="blog-post">
             <h2 id="conclusion">Conclusion<a href="#conclusion" class="anchor-link" aria-label="Link to Conclusion">#</a></h2>
-            <p>So this was a short overview of how Papyrus works. If you have any questions, suggestions, or just want to talk, contact me on Twitter (<a href="https://twitter.com/0xApollyon" target="_blank" class="highlight">@0xApollyon</a>) or on Discord <span class="highlight">(0xapollyon)</span></p>
+            <p>So this was a short overview of how Papyrus works. If you have any questions, suggestions, or just want to talk, contact me on Twitter (<a href="https://twitter.com/0xApollyon" target="_blank" rel="noopener noreferrer" class="highlight" aria-label="Contact 0xApollyon on Twitter">@0xApollyon</a>) or on Discord <span class="highlight">(0xapollyon)</span></p>
         </div>
 
     </div>
