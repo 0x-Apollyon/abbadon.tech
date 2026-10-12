@@ -3,11 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            var mode = (params.get('mode') || '').toLowerCase();
+            if (mode === 'agent' || mode === 'llm' || mode === 'ai') {
+                var path = window.location.pathname;
+                var mdUrl;
+                if (path.endsWith('.html')) {
+                    mdUrl = path.replace(/\.html$/, '.md');
+                } else if (path.endsWith('/')) {
+                    mdUrl = path + 'index.md';
+                } else if (path.endsWith('/blog')) {
+                    mdUrl = path + '/index.md';
+                } else {
+                    mdUrl = path + '.md';
+                }
+                window.location.replace(mdUrl);
+            }
+        })();
+    </script>
     <title>StarHealth Data Breach: Insider threat or smoke and mirrors ?</title>
+    <meta name="description" content="Comprehensive analysis of the StarHealth Insurance data breach and exploring the timeline of events,">
+    <meta name="author" content="Abbadon">
+    <link rel="canonical" href="https://abbadon.tech/blog/starhealth.html">
     <link rel="icon" type="image/x-icon" href="./../icon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="alternate" type="text/markdown" href="starhealth.md" title="Markdown version of StarHealth Data Breach Analysis">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:site_name" content="Letters from Abbadon">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://abbadon.tech/blog/starhealth.html">
+    <meta property="og:title" content="StarHealth Data Breach: Insider threat or smoke and mirrors ?">
+    <meta property="og:description" content="Comprehensive analysis of the StarHealth Insurance data breach and exploring the timeline of events,">
+    <meta property="og:image" content="https://abbadon.tech/blog/bastille.png">
+    <meta property="og:image:alt" content="Breach of the French fortress-prison Bastille">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@0xApollyon">
+    <meta name="twitter:creator" content="@0xApollyon">
+    <meta name="twitter:url" content="https://abbadon.tech/blog/starhealth.html">
+    <meta name="twitter:title" content="StarHealth Data Breach: Insider threat or smoke and mirrors ?">
+    <meta name="twitter:description" content="Comprehensive analysis of the StarHealth Insurance data breach and exploring the timeline of events,">
+    <meta name="twitter:image" content="https://abbadon.tech/blog/bastille.png">
+    <meta name="twitter:image:alt" content="Breach of the French fortress-prison Bastille">
+
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- AI SEO: Schema.org Metadata -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "StarHealth Data Breach: Insider threat or smoke and mirrors ?",
+      "author": {
+        "@type": "Person",
+        "name": "Abbadon",
+        "url": "https://abbadon.tech"
+      },
+      "url": "https://abbadon.tech/blog/starhealth.html",
+      "encoding": [
+        {
+          "@type": "MediaObject",
+          "encodingFormat": "text/html",
+          "contentUrl": "https://abbadon.tech/blog/starhealth.html"
+        },
+        {
+          "@type": "MediaObject",
+          "encodingFormat": "text/markdown",
+          "contentUrl": "https://abbadon.tech/blog/starhealth.md",
+          "description": "Raw markdown text optimized for AI processing and LLM ingestion."
+        }
+      ],
+      "keywords": "StarHealth data breach, xenZen threat actor, insider threat analysis, StarHealth insurance, CISO data breach, stealer logs initial access, BreachForums, OSINT, Infosec"
+    }
+    </script>
     
     <!-- Highlight.js for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
@@ -179,8 +253,8 @@
             max-width: 100%;
             height: auto;
             display: block;
-            margin: 24px 0;
-            border-radius: 8px;
+            margin: 24px auto;
+            border-radius: 0;
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
@@ -340,7 +414,7 @@
 
     <!-- FIXED TOP NAVBAR -->
     <div class="top-bar">
-        <nav class="navbar">
+        <nav class="navbar" aria-label="Main menu">
             <a href="https://abbadon.tech/blog/" class="nav-brand">Letters from Abbadon</a>
             <div class="nav-links">
                 <a href="https://abbadon.tech">Home</a>
@@ -350,11 +424,18 @@
         </nav>
     </div>
 
-    <div class="content">
-        <!-- REFINED BACK BUTTON -->
-        <a href="index.html" class="home-button">
-            <span>&larr;</span> read something else
-        </a>
+    <main class="content" aria-label="Blog content">
+        <!-- REFINED BACK BUTTON & AI MARKDOWN LINK -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+            <a href="index.html" class="home-button" style="margin-bottom: 0;" aria-label="Return to blog index">
+                <span aria-hidden="true">&larr;</span> read something else
+            </a>
+            
+            <a href="starhealth.md" type="text/markdown" target="_blank" rel="noopener noreferrer" class="home-button" style="margin-bottom: 0;" aria-label="Read raw Markdown format">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                .md for AI
+            </a>
+        </div>
 
         <div class="blog-title">StarHealth Data Breach: Insider threat or smoke and mirrors ?</div>
 
@@ -528,8 +609,7 @@ login_2 = {
                 And that's the end of my sort of deep dive into the StarHealth incident. If you found it good or I got something wrong, let me know!
             </p>
         </div>
-
-    </div>
+    </main>
 
     <script>
     /* Using DOMContentLoaded ensures scripts fire predictably even on minified servers / CDNs */

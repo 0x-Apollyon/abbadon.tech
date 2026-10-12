@@ -3,6 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            var mode = (params.get('mode') || '').toLowerCase();
+            if (mode === 'agent' || mode === 'llm' || mode === 'ai') {
+                var path = window.location.pathname;
+                var mdUrl;
+                if (path.endsWith('.html')) {
+                    mdUrl = path.replace(/\.html$/, '.md');
+                } else if (path.endsWith('/')) {
+                    mdUrl = path + 'index.md';
+                } else if (path.endsWith('/blog')) {
+                    mdUrl = path + '/index.md';
+                } else {
+                    mdUrl = path + '.md';
+                }
+                window.location.replace(mdUrl);
+            }
+        })();
+    </script>
     <title>Provable Randomness in Online Gambling</title>
     <link rel="icon" type="image/x-icon" href="./../icon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -3,11 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+    (function() {
+        var params = new URLSearchParams(window.location.search);
+        var mode = (params.get('mode') || '').toLowerCase();
+        if (mode === 'agent' || mode === 'llm' || mode === 'ai') {
+            var path = window.location.pathname;
+            var mdUrl;
+            if (path.endsWith('.html')) {
+                mdUrl = path.replace(/\.html$/, '.md');
+            } else if (path.endsWith('/')) {
+                mdUrl = path + 'index.md';
+            } else if (path.endsWith('/blog')) {
+                mdUrl = path + '/index.md';
+            } else {
+                mdUrl = path + '.md';
+            }
+            window.location.replace(mdUrl);
+        }
+    })();
+</script>
 <title>Abbadon: The home of Apollyon</title>
+<meta name="description" content="Letters from Abbadon - Musings on technical and non technical stuff">
+<meta name="author" content="Abbadon">
+<link rel="canonical" href="https://abbadon.tech/blog/">
+<link rel="alternate" type="text/markdown" href="index.md" title="Markdown version of Letters from Abbadon">
 <link rel="icon" type="image/x-icon" href="./../icon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=VT323&display=swap" rel="stylesheet">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:site_name" content="Letters from Abbadon">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://abbadon.tech/blog/">
+<meta property="og:title" content="Abbadon: The home of Apollyon">
+<meta property="og:description" content="Letters from Abbadon - Musings on technical and non technical stuff">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@0xApollyon">
+<meta name="twitter:creator" content="@0xApollyon">
+<meta name="twitter:url" content="https://abbadon.tech/blog/">
+<meta name="twitter:title" content="Abbadon: The home of Apollyon">
+<meta name="twitter:description" content="Letters from Abbadon - Musings on technical and non technical stuff">
+
+<meta name="theme-color" content="#ffffff">
+
+<!-- AI SEO: Schema.org Metadata -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "Letters from Abbadon",
+  "description": "Letters from Abbadon - Musings on technical and non technical stuff",
+  "url": "https://abbadon.tech/blog/",
+  "author": {
+    "@type": "Person",
+    "name": "Abbadon",
+    "url": "https://abbadon.tech"
+  },
+  "encoding": [
+    {
+      "@type": "MediaObject",
+      "encodingFormat": "text/html",
+      "contentUrl": "https://abbadon.tech/blog/"
+    },
+    {
+      "@type": "MediaObject",
+      "encodingFormat": "text/markdown",
+      "contentUrl": "https://abbadon.tech/blog/index.md",
+      "description": "Raw markdown text optimized for AI processing and LLM ingestion."
+    }
+  ]
+}
+</script>
 
 <style>
     :root {
@@ -278,7 +348,7 @@
 
 <!-- FIXED NAV & FILTERS -->
 <div class="top-bar">
-    <nav class="navbar">
+    <nav class="navbar" aria-label="Main menu">
         <a href="https://abbadon.tech/blog/" class="nav-brand">Letters from Abbadon</a>
         <div class="nav-links">
             <a href="https://abbadon.tech">Home</a>
@@ -287,7 +357,7 @@
         </div>
     </nav>
     <div class="filter-container">
-        <button class="filter-btn active" data-filter="all">*</button>
+        <button class="filter-btn active" data-filter="all" aria-label="All topics"><span aria-hidden="true">*</span></button>
         <button class="filter-btn" data-filter="cryptography">Cryptography</button>
         <button class="filter-btn" data-filter="infosec">Infosec</button>
         <button class="filter-btn" data-filter="malware_dev">Malware_Dev</button>
@@ -300,7 +370,7 @@
 <div class="scanlines"></div>
 
 <div class="wrapper">
-    <main class="container">
+    <main class="container" aria-label="Blog content">
     
         <div class="post-list">
             

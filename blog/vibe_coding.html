@@ -3,19 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            var mode = (params.get('mode') || '').toLowerCase();
+            if (mode === 'agent' || mode === 'llm' || mode === 'ai') {
+                var path = window.location.pathname;
+                var mdUrl;
+                if (path.endsWith('.html')) {
+                    mdUrl = path.replace(/\.html$/, '.md');
+                } else if (path.endsWith('/')) {
+                    mdUrl = path + 'index.md';
+                } else if (path.endsWith('/blog')) {
+                    mdUrl = path + '/index.md';
+                } else {
+                    mdUrl = path + '.md';
+                }
+                window.location.replace(mdUrl);
+            }
+        })();
+    </script>
     <title>Basic security in the age of vibe coding</title>
-    
-    <meta property="og:title" content="Basic security in the age of vibe coding" />
-    <meta property="og:description" content="Vibe coding lets you generate code with LLMs instead of learning to code. While powerful, it’s easy to mess up and leave your B2B SaaS app vulnerable. Here’s a checklist to keep your webapp from getting obliterated." />
-    <meta property="og:image" content="https://abbadon.tech/blog/vibe_coding_imgs/im_under_attack.png" />
-    <meta property="og:url" content="https://abbadon.tech/blog/vibe_coding.html" />
-    <meta property="og:type" content="blog" />
-    <meta property="og:site_name" content="Abbadon.tech" />
-
+    <meta name="description" content="Vibe coding lets you generate code with LLMs instead of learning to code. While useful, it’s easy to mess up and leave your B2B SaaS app vulnerable. Here’s a checklist to keep your webapp from getting obliterated.">
+    <meta name="author" content="Abbadon">
+    <link rel="canonical" href="https://abbadon.tech/blog/vibe_coding.html">
     <link rel="icon" type="image/x-icon" href="./../icon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="alternate" type="text/markdown" href="vibe_coding.md" title="Markdown version of Basic Security in the Age of Vibe Coding">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:site_name" content="Letters from Abbadon">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://abbadon.tech/blog/vibe_coding.html">
+    <meta property="og:title" content="Basic security in the age of vibe coding">
+    <meta property="og:description" content="Vibe coding lets you generate code with LLMs instead of learning to code. While useful, it’s easy to mess up and leave your B2B SaaS app vulnerable. Here’s a checklist to keep your webapp from getting obliterated.">
+    <meta property="og:image" content="https://abbadon.tech/blog/rick_rubin.png">
+    <meta property="og:image:alt" content="Rick rubin lost in the vibes">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@0xApollyon">
+    <meta name="twitter:creator" content="@0xApollyon">
+    <meta name="twitter:url" content="https://abbadon.tech/blog/vibe_coding.html">
+    <meta name="twitter:title" content="Basic security in the age of vibe coding">
+    <meta name="twitter:description" content="Vibe coding lets you generate code with LLMs instead of learning to code. While useful, it’s easy to mess up and leave your B2B SaaS app vulnerable. Here’s a checklist to keep your webapp from getting obliterated.">
+    <meta name="twitter:image" content="https://abbadon.tech/blog/rick_rubin.png">
+    <meta name="twitter:image:alt" content="Rick rubin lost in the vibes">
+
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- AI SEO: Schema.org Metadata -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Basic security in the age of vibe coding",
+      "author": {
+        "@type": "Person",
+        "name": "Abbadon",
+        "url": "https://abbadon.tech"
+      },
+      "url": "https://abbadon.tech/blog/vibe_coding.html",
+      "encoding": [
+        {
+          "@type": "MediaObject",
+          "encodingFormat": "text/html",
+          "contentUrl": "https://abbadon.tech/blog/vibe_coding.html"
+        },
+        {
+          "@type": "MediaObject",
+          "encodingFormat": "text/markdown",
+          "contentUrl": "https://abbadon.tech/blog/vibe_coding.md",
+          "description": "Raw markdown text optimized for AI processing and LLM ingestion."
+        }
+      ],
+      "keywords": "vibe coding security, web application security checklist, API key exposure, XSS, IDOR, CORS misconfiguration, Firebase security rules, S3 bucket security, SQL injection, DDoS protection, rate limiting"
+    }
+    </script>
     
     <!-- Highlight.js for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
@@ -188,7 +254,7 @@
             height: auto;
             display: block;
             margin: 24px auto; /* Centers the image */
-            border-radius: 8px;
+            border-radius: 0;
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
@@ -355,7 +421,7 @@
 
     <!-- FIXED TOP NAVBAR -->
     <div class="top-bar">
-        <nav class="navbar">
+        <nav class="navbar" aria-label="Main menu">
             <a href="https://abbadon.tech/blog/" class="nav-brand">Letters from Abbadon</a>
             <div class="nav-links">
                 <a href="https://abbadon.tech">Home</a>
@@ -365,11 +431,18 @@
         </nav>
     </div>
 
-    <div class="content">
-        <!-- REFINED BACK BUTTON -->
-        <a href="index.html" class="home-button">
-            <span>&larr;</span> read something else
-        </a>
+    <main class="content" aria-label="Blog content">
+        <!-- REFINED BACK BUTTON & AI MARKDOWN LINK -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+            <a href="index.html" class="home-button" style="margin-bottom: 0;" aria-label="Return to blog index">
+                <span aria-hidden="true">&larr;</span> read something else
+            </a>
+            
+            <a href="vibe_coding.md" type="text/markdown" target="_blank" rel="noopener noreferrer" class="home-button" style="margin-bottom: 0;" aria-label="Read raw Markdown format">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                .md for AI
+            </a>
+        </div>
 
         <div class="blog-title">Basic security in the age of vibecoding</div>
 
@@ -463,7 +536,7 @@ Body: { "user_id": 124 }</script></code></pre>
             <img src="./vibe_coding_imgs/fox_news.png" alt="Fox News Meme" class="post-image">
             
             <p>Setting <code>Access-Control-Allow-Origin: *</code> means any website, anywhere, can make requests to your API. This allows for attacks such as session hijacking. So to fix this, only allow trusted domains and subdomains in ACAO and ACAC, pretty easy.</p>
-            <p>Also time to insert a shameless plug, I have worked on a small utility YA-CORS to scan for common CORS misconfigurations. You can find it <a href="https://github.com/0x-Apollyon/YA-CORS" target="_blank">here.</a></p>
+            <p>Also time to insert a shameless plug, I have worked on a small utility YA-CORS to scan for common CORS misconfigurations. You can find it <a href="https://github.com/0x-Apollyon/YA-CORS" target="_blank" rel="noopener noreferrer" aria-label="YA-CORS repository on GitHub">here.</a></p>
         </div>
 
         <div class="blog-post">
@@ -480,7 +553,7 @@ Body: { "user_id": 124 }</script></code></pre>
 }</script></code></pre>
 
             <p>This means anyone on the internet can read all your data and modify or delete your database (reset user passwords, inject fake content and god knows what). Supabase is slightly better with Row Level Security (RLS), but if disabled, the database behaves like an open book for anyone with the API URL.</p>
-            <p>To fix this vulnerability, modify firestore rules to allow access only to authenticated users. For Supabase, do not disable (enable it if its disabled) Row Level Security (RLS) and write secure policies. This is very basic advice, read <a href="https://firebase.google.com/support/guides/security-checklist" target="_blank">this</a> and <a href="https://firebase.google.com/docs/rules/insecure-rules" target="_blank">this</a> for firebase. For supabase, read <a href="https://supabase.com/docs/guides/database/postgres/row-level-security" target="_blank">this</a>.</p>
+            <p>To fix this vulnerability, modify firestore rules to allow access only to authenticated users. For Supabase, do not disable (enable it if its disabled) Row Level Security (RLS) and write secure policies. This is very basic advice, read <a href="https://firebase.google.com/support/guides/security-checklist" target="_blank" rel="noopener noreferrer" aria-label="Firebase security checklist">this</a> and <a href="https://firebase.google.com/docs/rules/insecure-rules" target="_blank" rel="noopener noreferrer" aria-label="Firebase insecure rules guide">this</a> for firebase. For supabase, read <a href="https://supabase.com/docs/guides/database/postgres/row-level-security" target="_blank" rel="noopener noreferrer" aria-label="Supabase row level security documentation">this</a>.</p>
         </div>
         
         <div class="blog-post">
@@ -491,7 +564,7 @@ Body: { "user_id": 124 }</script></code></pre>
             <p>A threat actor can not only read from insecure buckets, but can also modify them. This can allow them to introduce malicious content, deface your webapp or even hold your files for ransom (Scattered Spider). Threat actors also love utilizing vulnerable s3 buckets as a way to exfiltrate data from their other operations without beind detected.</p>
             <img src="./vibe_coding_imgs/s3.png" alt="S3 Bucket permissions" class="post-image">
             
-            <p>To fix this issue, make sure your buckets are private by default, allow access only to your app by using bucket policies (or specific users/roles). Read <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html" target="_blank">this</a> for more info.</p>
+            <p>To fix this issue, make sure your buckets are private by default, allow access only to your app by using bucket policies (or specific users/roles). Read <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html" target="_blank" rel="noopener noreferrer" aria-label="Amazon S3 security best practices documentation">this</a> for more info.</p>
         </div>
         
         <div class="blog-post">
@@ -576,8 +649,7 @@ def login():
                 <img src="./vibe_coding_imgs/blicky.png" alt="A cute cat picture" class="post-image" style="margin: 0 auto;">
             </div>
         </div>
-
-    </div>
+    </main>
 
     <script>
     /* Using DOMContentLoaded ensures scripts fire predictably even on minified servers / CDNs */
