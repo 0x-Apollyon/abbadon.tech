@@ -3,18 +3,109 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Lumen: Light Against Cyber Threats</title>
+        <title>Rhysida Ransomware Note | Threat Intelligence & Artifacts - Lumen</title>
         <link rel="icon" type="image/x-icon" href="./logo.png">
         <link rel="stylesheet" href="index.css">
+        <link rel="alternate" type="text/markdown" href="rhysida_ransomnote.md" title="Raw Markdown version of Rhysida Ransom Note">
+        <link rel="canonical" href="https://abbadon.tech/lumen/rhysida_ransomnote.html">
+
+        <meta name="description" content="Analysis and raw artifact transcript of the Rhysida ransomware extortion note from the Lumen Threat Registry.">
+        <meta name="author" content="0xApollyon">
+        <meta name="theme-color" content="#151414">
+
+        <meta property="og:site_name" content="Lumen Threat Registry">
+        <meta property="og:type" content="article">
+        <meta property="og:url" content="https://abbadon.tech/lumen/rhysida_ransomnote.html">
+        <meta property="og:title" content="Rhysida Ransomware Note | Threat Intelligence & Artifacts - Lumen">
+        <meta property="og:description" content="Analysis and raw artifact transcript of the Rhysida ransomware extortion note from the Lumen Threat Registry.">
+        <meta property="og:image" content="https://abbadon.tech/lumen/logo.png">
+        <meta property="og:image:alt" content="Lumen Registry Threat Intelligence Banner">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@0xApollyon">
+        <meta name="twitter:creator" content="@0xApollyon">
+        <meta name="twitter:url" content="https://abbadon.tech/lumen/rhysida_ransomnote.html">
+        <meta name="twitter:title" content="Rhysida Ransomware Note | Threat Intelligence & Artifacts - Lumen">
+        <meta name="twitter:description" content="Analysis and raw artifact transcript of the Rhysida ransomware extortion note from the Lumen Threat Registry.">
+        <meta name="twitter:image" content="https://abbadon.tech/lumen/logo.png">
+        <meta name="twitter:image:alt" content="Lumen Registry Threat Intelligence Banner">
+
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "headline": "Rhysida Ransomware Note Artifact",
+          "description": "Analysis and raw artifact transcript of the Rhysida ransomware extortion note from the Lumen Threat Registry.",
+          "author": {
+            "@type": "Person",
+            "name": "0xApollyon",
+            "alternateName": ["0xapollyon", "Apollyon", "Aditya Manuja"],
+            "url": "https://abbadon.tech/contact/",
+            "sameAs": [
+              "https://github.com/0xApollyon",
+              "https://twitter.com/0xApollyon"
+            ]
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "Lumen Threat Registry",
+            "url": "https://abbadon.tech/lumen/"
+          },
+          "mainEntityOfPage": "https://abbadon.tech/lumen/rhysida_ransomnote.html",
+          "encoding": [
+            {
+              "@type": "MediaObject",
+              "contentUrl": "https://abbadon.tech/lumen/rhysida_ransomnote.html",
+              "encodingFormat": "text/html"
+            },
+            {
+              "@type": "MediaObject",
+              "contentUrl": "https://abbadon.tech/lumen/rhysida_ransomnote.md",
+              "encodingFormat": "text/markdown"
+            }
+          ],
+          "about": {
+            "@type": "ThreatActor",
+            "name": "Rhysida"
+          },
+          "keywords": ["Rhysida", "ransomware", "ransom note", "threat intelligence", "cyber threats", "Lumen", "indicators of compromise", "DFIR"]
+        }
+        </script>
+
         <style>
             pre {
                 white-space: pre-wrap;       /* Wraps the text within the pre block */
                 word-wrap: break-word;       /* Breaks long words if necessary */
             }
+            .aeo-nav {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin-top: 15px;
+                margin-bottom: 5px;
+            }
+            .aeo-link {
+                display: inline-block;
+                padding: 6px 14px;
+                background-color: #151414;
+                border: 1px solid #2a2a2a;
+                border-radius: 6px;
+                color: #ababab;
+                text-decoration: none;
+                font-family: monospace;
+                font-size: 16px;
+                transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+            }
+            .aeo-link:hover {
+                border-color: #ff0037;
+                color: #ffffff;
+                background-color: #1c1b1b;
+                text-decoration: none;
+            }
         </style>
     </head>
     <body>
-        <main class="site-wrapper">
+        <main class="site-wrapper" aria-label="Ransomware Note Content">
             <div class="row">
                 <div class="col-xs-12 col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
                     <div class="page-title home text-center">
@@ -24,7 +115,15 @@
                             <span class="heading-page text-center"> 
                                 The Lumen Register
                             </span>
-                        </center>   
+                        </center>
+                        <nav class="aeo-nav" aria-label="Main menu">
+                            <a href="index.html" class="aeo-link" aria-label="Return to Lumen Register index">
+                                <span aria-hidden="true">&larr;</span> Back to Register
+                            </a>
+                            <a href="rhysida_ransomnote.md" type="text/markdown" target="_blank" rel="noopener noreferrer" class="aeo-link" aria-label="Read raw Markdown format for Rhysida ransom note">
+                                .md for AI
+                            </a>
+                        </nav>
                         <div class="page-title home text-center">
                             <br><br>
                             <center>

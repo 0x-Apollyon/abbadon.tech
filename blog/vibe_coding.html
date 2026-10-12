@@ -187,7 +187,7 @@
             max-width: 100%;
             height: auto;
             display: block;
-            margin: 24px 0;
+            margin: 24px auto; /* Centers the image */
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
@@ -323,6 +323,13 @@
             margin: 0;
         }
         
+        /* Fallback padding for code blocks that highlight.js misses */
+        pre.code-block code {
+            display: block;
+            padding: 16px 18px;
+            overflow-x: auto;
+        }
+
         .wrap-text {
             white-space: pre-wrap !important;
             word-break: break-all !important;
@@ -368,13 +375,16 @@
 
         <!-- HERO IMAGE -->
         <figure class="hero-figure">
-            <img src="./vibe_coding_imgs/im_under_attack.png" alt="A humorous look at vibecoding security" class="hero-image">
-            <figcaption class="hero-caption">When the vibes are good but the architecture is completely vulnerable.</figcaption>
+            <img src="rick_rubin.png" alt="Rick rubin lost in the vibes" class="hero-image">
+            <figcaption class="hero-caption">When vibing, remember, you are not Rick Rubin</figcaption>
         </figure>
 
         <div class="blog-post">
             <h2 id="what-is-vibecoding">So what is vibecoding ?<a href="#what-is-vibecoding" class="anchor-link" aria-label="Link to What is vibecoding">#</a></h2>
             <p>Vibe coding, the art of prompting LLMs to generate code for you instead of learning to code. While it does empower many people to build whatever they want and increases productivity by orders of magnitude, it is very easy to mess up your code and your B2B SaaS app, which is supposed to make you a gazillion dollars, is obliterated by randoms on the internet.</p> 
+            
+            <img src="./vibe_coding_imgs/im_under_attack.png" alt="A humorous look at vibecoding security" class="post-image">
+            
             <p>It is easy to point and laugh at the tech bros who claim to be earning the big bucks without spending a single second actually writing code, but its better if they are helped because we all were noobs once (though some of the tech bros have been noobs for too long ngl).</p>
             <p>So this is a basic checklist of stuff you should do so your webapp doesnt go down the drain coz of basic vulnerabilities. While it will not make your vibecoded project "unhackable", it would sure make it a lot, lot safer.</p>
         </div>
