@@ -2,13 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Basic security in the age of vibe coding</title>
-    <link rel="icon" type="image/x-icon" href="./../icon.ico">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
-
+    
     <meta property="og:title" content="Basic security in the age of vibe coding" />
     <meta property="og:description" content="Vibe coding lets you generate code with LLMs instead of learning to code. While powerful, it’s easy to mess up and leave your B2B SaaS app vulnerable. Here’s a checklist to keep your webapp from getting obliterated." />
     <meta property="og:image" content="https://abbadon.tech/blog/vibe_coding_imgs/im_under_attack.png" />
@@ -16,358 +12,689 @@
     <meta property="og:type" content="blog" />
     <meta property="og:site_name" content="Abbadon.tech" />
 
+    <link rel="icon" type="image/x-icon" href="./../icon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    
+    <!-- Highlight.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
     <style>
+        :root {
+            /* Sleek text colors */
+            --text: #8e8e96;
+            --muted: #52525a;
+            --head: #d8d8dd;
+            --accent: #a3a3a8;
+            --border: rgba(255, 255, 255, 0.1);
+            
+            /* Fixed SVG Chalk line */
+            --chalk-line: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='100%25'%20height='20'%3E%3Cfilter%20id='chalk'%20filterUnits='userSpaceOnUse'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.35%200.1'%20numOctaves='4'%20result='noise'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20in2='noise'%20scale='4'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3C/filter%3E%3Cpath%20d='M-10,10%20L3000,10'%20fill='none'%20stroke='%23ffffff'%20stroke-width='2.5'%20stroke-opacity='0.75'%20filter='url(%23chalk)'/%3E%3C/svg%3E");
+        }
+        
+        * { box-sizing: border-box; }
+        
+        html { 
+            -webkit-text-size-adjust: 100%; 
+            scroll-behavior: smooth; 
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+        }
+        
         body {
-            font-family: 'Press Start 2P', serif;
-            background-color: black;
-            color: white;
             margin: 0;
-            display: flex;
-            font-size: 12px;
-            line-height: 1.6;
             min-height: 100vh;
+            background-color: #060608; 
+            color: var(--text);
+            font-family: 'IBM Plex Mono', 'Courier New', monospace;
+            font-size: 15px;
+            line-height: 1.8;
+            overflow-x: hidden;
+            position: relative;
+            z-index: 0;
         }
-        .side-menu {
-            width: 250px;
-            background-color: #1a1a1a;
-            padding: 20px;
-            height: auto;
-            min-height: 100%;
+
+        body::after {
+            content: "";
+            position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 220px 220px; 
+            opacity: 0.12;
+            mix-blend-mode: screen; 
+            filter: grayscale(100%) contrast(300%) brightness(60%);
+        }
+
+        /* --- FIXED NAVIGATION BAR --- */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            background-color: #060608;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: 1px dashed var(--border);
         }
-        .home-button {
-            padding: 10px;
-            background-color: #333;
-            color: white;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.3s;
+
+        .nav-brand {
+            font-family: 'VT323', monospace;
+            font-size: 2rem;
+            color: var(--head);
             text-decoration: none;
-            margin-bottom: 20px;
+            letter-spacing: 2px;
         }
-        .home-button:hover {
-            background-color: #444;
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
         }
-        .content {
-            flex-grow: 1;
-            padding: 20px;
-            max-width: 1000px;
-            margin: 0 auto;
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
         }
+
+        .nav-links a:hover {
+            color: #ffffff;
+        }
+
+        .content { 
+            position: relative; 
+            z-index: 1; 
+            max-width: 74ch; 
+            margin: 0 auto; 
+            padding: 140px 20px 96px; 
+        }
+
+        /* --- REFINED BACK BUTTON --- */
+        .home-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            margin-bottom: 40px;
+            font-size: 13px;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        
+        .home-button:hover, .home-button:focus-visible { 
+            color: var(--head);
+        }
+        
+        .home-button:active {
+            transform: translateX(-4px);
+        }
+
         .blog-title {
-            font-size: 30px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(16px, 4.2vw, 24px);
+            line-height: 1.6;
+            margin: 0 0 56px; 
+            color: #ffffff; 
+            text-shadow: 0 4px 8px rgba(0,0,0,0.8);
+            text-align: left; 
+        }
+        
+        .blog-title::after { 
+            content: ""; 
+            display: block; 
+            height: 20px; 
+            margin-top: 18px;
+            background: var(--chalk-line) left center no-repeat; 
+        }
+
+        /* --- RESPONSIVE HERO IMAGE & CAPTION --- */
+        .hero-figure {
+            margin: 0 0 56px 0;
+            padding: 0;
+            display: block;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 0;
+            border: none;
+            background-color: #111; 
+            min-height: 250px;       
+            object-fit: cover;
+        }
+
+        .hero-caption {
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--muted);
             text-align: center;
-            margin-bottom: 30px;
         }
-        .blog-post {
-            background-color: #1a1a1a;
-            margin-bottom: 20px;
-            padding: 25px;
+
+        /* --- POST IMAGES --- */
+        .post-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 24px 0;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
+
         .blog-post h2 {
-            font-size: 16px;
-            margin-bottom: 20px;
-            color: #00ff00;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.7;
+            color: var(--head);
+            margin: 56px 0 20px;
+            text-shadow: 0 2px 2px rgba(0,0,0,0.9);
+            text-align: left;
+            scroll-margin-top: 110px; 
         }
-        .blog-post p {
-            font-size: 12px;
-            margin-bottom: 15px;
+        
+        .blog-post h2:first-child { margin-top: 0; }
+        
+        .blog-post h2::after { 
+            content: ""; 
+            display: block; 
+            width: min(240px, 65%); 
+            height: 20px; 
+            margin-top: 6px; 
+            background: var(--chalk-line) left center no-repeat; 
         }
+
+        /* --- SUBHEADING ANCHOR LINKS --- */
+        .anchor-link {
+            display: inline-block;
+            margin-left: 14px;
+            color: var(--muted);
+            text-decoration: none;
+            opacity: 0;
+            transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+        
+        .blog-post h2:hover .anchor-link,
+        .anchor-link:focus-visible {
+            opacity: 1;
+        }
+        
+        .anchor-link:hover, .anchor-link:focus-visible {
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+
+        @media (hover: none) {
+            .anchor-link {
+                opacity: 1;
+                color: rgba(255, 255, 255, 0.15);
+            }
+        }
+        
+        .blog-post p { margin: 0 0 18px; }
+        .blog-post ul, .blog-post ol { margin: 0 0 24px 20px; padding: 0; }
+        .blog-post li { margin-bottom: 12px; }
+        
+        /* Inline and block highlights */
+        span.highlight { color: var(--head); font-weight: 600; text-shadow: 0 1px 1px #000; }
+        div.highlight { 
+            color: var(--head); 
+            font-weight: 600; 
+            text-shadow: 0 1px 1px #000; 
+            background: rgba(255, 255, 255, 0.04); 
+            padding: 12px 16px; 
+            border-radius: 6px; 
+            margin: 16px 0; 
+            word-break: break-all;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        
+        /* Restrict styling specifically to inline code to avoid clashing with highlight.js */
+        :not(pre) > code {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', Consolas, monospace;
+            font-size: 13.5px;
+            color: var(--head);
+        }
+
+        a { color: var(--head); text-underline-offset: 3px; }
+        a:hover { color: var(--accent); }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+        /* CLEAN, BLENDED CODE BLOCK STYLING */
+        .code-wrap {
+            position: relative;
+            background: #000000; 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            margin: 22px 0 26px;
+        }
+
+        .code-bar, .code-foot { 
+            display: flex; justify-content: space-between; align-items: center; 
+            color: var(--muted); font-size: 12px; 
+            background: #000000; 
+        }
+        
+        .code-bar { 
+            padding: 6px 8px 6px 16px; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04); 
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .code-foot { 
+            border-top: 1px solid rgba(255, 255, 255, 0.04); 
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .icon-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; padding: 0;
+            color: var(--muted); background: transparent; border: 0; border-radius: 6px; cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .icon-btn:hover { color: var(--head); background: rgba(255, 255, 255, .08); }
+        .icon-btn:active { background: rgba(255, 255, 255, .12); }
+        .icon-btn svg { width: 16px; height: 16px; }
+        .code-foot .icon-btn { width: 100%; border-radius: 0 0 8px 8px; height: 34px; }
+        .code-wrap.collapsed .fold svg { transform: scaleY(-1); }
+        
+        .code-wrap.collapsed pre {
+            max-height: 118px; overflow: hidden;
+            -webkit-mask-image: linear-gradient(#000 55%, transparent);
+            mask-image: linear-gradient(#000 55%, transparent);
+        }
+
         .code-block {
-            background-color: #2a2a2a;
-            padding: 15px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            overflow-x: auto;
-            font-family: "Source Code Pro", monospace;
-            color: #fff; /* Optional: Makes text readable on dark background */;
+            margin: 0;
+        }
+        
+        .wrap-text {
+            white-space: pre-wrap !important;
+            word-break: break-all !important;
         }
 
-        .highlight {
-            color: #00ff00;
+        .hljs {
+            background: transparent !important;
+            padding: 16px 18px !important;
+            font-size: 13px;
+            line-height: 1.65;
+            font-family: 'IBM Plex Mono', Consolas, monospace;
         }
 
-
-        details {
-            background-color: #2a2a2a;
-            margin: 15px 0;
+        @media (max-width: 600px) {
+            body { font-size: 14px; }
+            .navbar { flex-direction: column; gap: 1rem; align-items: flex-start; padding: 1rem 1.5rem; }
+            .content { padding: 160px 16px 72px; }
+            .hljs { font-size: 12px; padding: 14px !important; }
         }
-
-        details summary {
-            padding: 15px;
-            cursor: pointer;
-            font-family: "Source Code Pro", monospace;
-            color: #fff;
-        }
-
-        details div {
-            padding: 15px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            overflow-x: auto;
-            font-family: "Source Code Pro", monospace;
-            color: #fff;
-        }
-
     </style>
 </head>
 <body>
-    <div class="side-menu">
-        <a href="index.html" class="home-button">Back to Home</a>
+
+    <!-- FIXED TOP NAVBAR -->
+    <div class="top-bar">
+        <nav class="navbar">
+            <a href="https://abbadon.tech/blog/" class="nav-brand">Letters from Abbadon</a>
+            <div class="nav-links">
+                <a href="https://abbadon.tech">Home</a>
+                <a href="https://abbadon.tech/projects">Projects</a>
+                <a href="https://abbadon.tech/contact/">Contact</a>
+            </div>
+        </nav>
     </div>
 
     <div class="content">
+        <!-- REFINED BACK BUTTON -->
+        <a href="index.html" class="home-button">
+            <span>&larr;</span> read something else
+        </a>
+
         <div class="blog-title">Basic security in the age of vibecoding</div>
 
+        <!-- HERO IMAGE -->
+        <figure class="hero-figure">
+            <img src="./vibe_coding_imgs/im_under_attack.png" alt="A humorous look at vibecoding security" class="hero-image">
+            <figcaption class="hero-caption">When the vibes are good but the architecture is completely vulnerable.</figcaption>
+        </figure>
+
         <div class="blog-post">
-            <h2>So what is vibecoding ? </h2>
+            <h2 id="what-is-vibecoding">So what is vibecoding ?<a href="#what-is-vibecoding" class="anchor-link" aria-label="Link to What is vibecoding">#</a></h2>
             <p>Vibe coding, the art of prompting LLMs to generate code for you instead of learning to code. While it does empower many people to build whatever they want and increases productivity by orders of magnitude, it is very easy to mess up your code and your B2B SaaS app, which is supposed to make you a gazillion dollars, is obliterated by randoms on the internet.</p> 
-            <br><center><img src="./vibe_coding_imgs/im_under_attack.png"></center> <br>
-            <p>It is easy to point and laugh at the tech bros who claim to be earning the big bucks without spending a single second actually writing code, but its better if they are helped because we all were noobs once (though some of the tech bros have been noobs for too long ngl).
-            </p>
+            <p>It is easy to point and laugh at the tech bros who claim to be earning the big bucks without spending a single second actually writing code, but its better if they are helped because we all were noobs once (though some of the tech bros have been noobs for too long ngl).</p>
             <p>So this is a basic checklist of stuff you should do so your webapp doesnt go down the drain coz of basic vulnerabilities. While it will not make your vibecoded project "unhackable", it would sure make it a lot, lot safer.</p>
         </div>
 
         <div class="blog-post">
-            <h2>1: No API keys on the frontend, ever</h2>
-            <p>Do not put any API keys, client secrets, auth tokens, private keys and ANYTHING of similar nature on the frontend. Even billion dollar VC firms are guilty of this crime (im looking at you a16z). This is like the cardinal sin of infosec. If you are putting API keys on the frontend, you are inherently exposing them to anyone who uses your webapp. And no, base64 encoding them , client side encrypting them or using a minifier doesnt fix the issue. </p>
-            <br><center><img src="./vibe_coding_imgs/fired.png"></center> <br>
+            <h2 id="no-api-keys">1: No API keys on the frontend, ever<a href="#no-api-keys" class="anchor-link" aria-label="Link to No API keys on frontend">#</a></h2>
+            <p>Do not put any API keys, client secrets, auth tokens, private keys and ANYTHING of similar nature on the frontend. Even billion dollar VC firms are guilty of this crime (im looking at you a16z). This is like the cardinal sin of infosec. If you are putting API keys on the frontend, you are inherently exposing them to anyone who uses your webapp. And no, base64 encoding them, client side encrypting them or using a minifier doesnt fix the issue. </p>
+            <img src="./vibe_coding_imgs/fired.png" alt="Meme about being fired for API keys" class="post-image">
+            
             <p>Threat actors can and will use exposed API keys to make requests as legitimate users. They will abuse it till they can, and if its a paid API you can say goodbye to them sweet credits. Worst case scenario, all your user data gets published on breachforums and your reputation is obliterated.</p> 
-            <br><center><img src="./vibe_coding_imgs/breachforums.png"></center> <br>
+            <img src="./vibe_coding_imgs/breachforums.png" alt="Breachforums screenshot" class="post-image">
+            
             <p>If your webapp is using external APIs, route all requests through your backend, which handles authentication properly. Use short lived OAuth flows or some other form of authentication on your frontend and also monitor the API usage to detect sus traffic. Implement periodic key rotation if possible.</p>
         </div>
+        
         <div class="blog-post">
-            <h2>2: Cross site scripting</h2>
+            <h2 id="xss">2: Cross site scripting<a href="#xss" class="anchor-link" aria-label="Link to Cross site scripting">#</a></h2>
             <p>Cross site scripting occurs when your website takes input and displays it as literal HTML code, allowing attackers to execute arbitrary JS. This is usually disastrous, as now anyone can steal cookies or modify page content to phish credentials (or add UFOs to your game), there are an infinite number of attacks. 
             </p>
-            <p>There are three main types of XSS attacks—stored, reflected, and DOM. Out of these, stored XSS, which is persistent, is the one that impacts most vibecoded projects.One rule of thumb to keep in mind is, never trust the frontend. Always sanitize the input, be it usernames, text, profile pictures, forum posts or stuff of similar nature. 
+            <p>There are three main types of XSS attacks—stored, reflected, and DOM. Out of these, stored XSS, which is persistent, is the one that impacts most vibecoded projects. One rule of thumb to keep in mind is, never trust the frontend. Always sanitize the input, be it usernames, text, profile pictures, forum posts or stuff of similar nature. 
             </p>
             <p>Use filters like React's inbuilt JSX filtering, Djangos escape(), libraries like DOMPurify or whatever it is in the framework you are using. Also implement a content security policy (CSP) which prohibits scripts from random external sources. To prevent cookies from being stolen, use the HTTP only flag.
             </p>
         </div>
+        
         <div class="blog-post">
-            <h2>3: Actually paid content</h2>
+            <h2 id="paid-content">3: Actually paid content<a href="#paid-content" class="anchor-link" aria-label="Link to Actually paid content">#</a></h2>
             <p>Vibe coding is big with the tech bros as stated earlier, so its obvious that most vibe coded projects are trying to sell you something. But the thing is people dont like paying for stuff, and they will access your content or software for free if they can. If you do have content which is behind a paywall, make sure the paywall is enforced on the backend, and its not just some hidden API endpoint, some obscure URL parameter, a frontend only block or something . 
             </p>
             <p>A surprising number of developers assume that just because their content or features are behind a UI-based paywall, users will respect it. Security through obscurity is a very flawed approach and it will eventually go tits up, so will your project if you are following it. 
             </p>
-            <br><center><img src="./vibe_coding_imgs/fog_of_war.png"></center> <br>
-            <p>Heres a short list of ineffective "paywalling" methods:
-            </p>
+            <img src="./vibe_coding_imgs/fog_of_war.png" alt="Fog of war abstraction" class="post-image">
+            
+            <p>Heres a short list of ineffective "paywalling" methods:</p>
             <ul>
-                <li>JS only frontend paywalls – A simple frontend check  like <p class="highlight">if (user.isPaid) { showContent() }</p> that can be bypassed with a single line in the browser console.</li>
-                <br>
+                <li>JS only frontend paywalls – A simple frontend check like <code>if (user.isPaid) { showContent() }</code> that can be bypassed with a single line in the browser console.</li>
                 <li>Hidden API Endpoints – An API that serves premium content but has no authentication, meaning anyone who finds the URL can access it freely.</li>
-                <br>
                 <li>Soft Restrictions – Using CSS to "blur" text or disable buttons while still loading the full content in the page source.</li>
             </ul>
-            <p>If you are using any of these methods, you arent using a paywall but instead a honor system. And well, the internet has no honor.
-            </p>
-            <br><center><img src="./vibe_coding_imgs/enemies.png"></center> <br>
-            <p>
-                To actually enforce a paywall, use backend verification. Ensure that all premium content and features are served only after a verified backend check.
-Every request must be authenticated, and the users subscription status should be validated before serving premium content. Also assume that people WILL try to bypass your paywall. Regularly audit your authentication flows and logs to detect unauthorized access.
-            </p>
-              
+            <p>If you are using any of these methods, you arent using a paywall but instead a honor system. And well, the internet has no honor.</p>
+            <img src="./vibe_coding_imgs/enemies.png" alt="Enemies meme" class="post-image">
+            
+            <p>To actually enforce a paywall, use backend verification. Ensure that all premium content and features are served only after a verified backend check. Every request must be authenticated, and the users subscription status should be validated before serving premium content. Also assume that people WILL try to bypass your paywall. Regularly audit your authentication flows and logs to detect unauthorized access.</p>
         </div>
+        
         <div class="blog-post">
-            <h2>4: IDORs</h2>
+            <h2 id="idors">4: IDORs<a href="#idors" class="anchor-link" aria-label="Link to IDORs">#</a></h2>
             <p>IDOR, which is an acronym for "Insecure Direct Object Reference" is a vulnerability that has catastrophic consequences if exploited (it is also my "favourite" vulnerability). When exploited, IDOR can lead to data breaches, unauthorized account takeovers, and full system compromise with minimal effort. 
             </p>
-            <p>Say you have an API endpoint which accepts a user id and deletes the users account.
-            </p>
-            <p class="highlight">POST /delete <br>
-                Body: { "user_id": 123 }</p>
+            <p>Say you have an API endpoint which accepts a user id and deletes the users account.</p>
+            
+            <pre class="code-block"><code class="language-http wrap-text"><script type="text/plain">POST /delete
+Body: { "user_id": 123 }</script></code></pre>
+            
             <p>Now if you dont check if the ID of the user in the request is actually the user, a threat actor can simply change the user id and deletes someone elses account.</p>
-            <p class="highlight">POST /delete <br>
-                Body: { "user_id": 124 }</p>
+            
+            <pre class="code-block"><code class="language-http wrap-text"><script type="text/plain">POST /delete
+Body: { "user_id": 124 }</script></code></pre>
+            
             <p>Combine this with a for loop iterating through all user ids and suddenly your "next facebook" has zero users, or maybe it had zero users in the first place.</p>
-            <p>Big multibillion dollar companies (Facebook, Twitter/X, Pandabuy) aswell as government agencies have falled victim to this vulnerability. 
-            </p>
-            <br><center><img src="./vibe_coding_imgs/pandabuy.png"></center> <br>
-            <p>To prevent your "next facebook" from being added to this list, ensure the logged-in user owns the object being accessed before  performing any action (read, update, delete). Also track and alert on suspicious object access patterns, such as a single user requesting multiple user IDs in quick succession.
-            </p>
+            <p>Big multibillion dollar companies (Facebook, Twitter/X, Pandabuy) aswell as government agencies have falled victim to this vulnerability. </p>
+            <img src="./vibe_coding_imgs/pandabuy.png" alt="Pandabuy Breach" class="post-image">
+            
+            <p>To prevent your "next facebook" from being added to this list, ensure the logged-in user owns the object being accessed before performing any action (read, update, delete). Also track and alert on suspicious object access patterns, such as a single user requesting multiple user IDs in quick succession.</p>
         </div>
 
         <div class="blog-post">
-            <h2>5: CORS</h2>
-            <p>CORS, which is an acronym for Cross-Origin Resource Sharing is a built in security mechanism in modern browsers which blocks cross origin requests by default (SOP: Same origin policy). By default, if a web page on example.com tries to fetch data from api.example.com, the browser blocks the request unless api.example.com explicitly allows it via CORS headers. There are two main CORS headers:
-            </p>
+            <h2 id="cors">5: CORS<a href="#cors" class="anchor-link" aria-label="Link to CORS">#</a></h2>
+            <p>CORS, which is an acronym for Cross-Origin Resource Sharing is a built in security mechanism in modern browsers which blocks cross origin requests by default (SOP: Same origin policy). By default, if a web page on example.com tries to fetch data from api.example.com, the browser blocks the request unless api.example.com explicitly allows it via CORS headers. There are two main CORS headers:</p>
             <ul>
-                <li>ACAO (Access Control Allow Origin): This controls which domains are allowed to access the resources.</li> <br>
-                <li>ACAC (Access Control Allow Credentials): This controls whether cookies and credentials (such as session tokens) can be sent with cross-origin requests.</li><br>
+                <li>ACAO (Access Control Allow Origin): This controls which domains are allowed to access the resources.</li>
+                <li>ACAC (Access Control Allow Credentials): This controls whether cookies and credentials (such as session tokens) can be sent with cross-origin requests.</li>
             </ul>
             <p>(There are two others, ACAH for allowed headers and ACAM for allowed methods but they are pretty much irrelevant here)</p>
-            <p>Now, you might be tempted to set ACAO header to * to allow all your domains to access the resources.
-                WRONG. NOT ONLY IS THIS LAZY (laziness is a "virtue" in a society - Doreen Ford on Fox News, Jan 25, 2022), IT MAKES YOUR APPLICATION INSECURE.</p>
-                <br><center><img src="./vibe_coding_imgs/fox_news.png"></center> <br>
-            <p>
-                Setting Access-Control-Allow-Origin: * means any website, anywhere, can make requests to your API. This allows for attacks such as session hijacking. So to fix this, only allow trusted domains and subdomains in ACAO and ACAC, pretty easy.
-            </p>
-            <p>
-                Also time to insert a shameless plug, I have worked on a small utility YA-CORS to scan for common CORS misconfigurations. You can find it <a href="https://github.com/0x-Apollyon/YA-CORS">here. </a>
-            </p>
-
+            <p>Now, you might be tempted to set ACAO header to * to allow all your domains to access the resources. WRONG. NOT ONLY IS THIS LAZY (laziness is a "virtue" in a society - Doreen Ford on Fox News, Jan 25, 2022), IT MAKES YOUR APPLICATION INSECURE.</p>
+            <img src="./vibe_coding_imgs/fox_news.png" alt="Fox News Meme" class="post-image">
+            
+            <p>Setting <code>Access-Control-Allow-Origin: *</code> means any website, anywhere, can make requests to your API. This allows for attacks such as session hijacking. So to fix this, only allow trusted domains and subdomains in ACAO and ACAC, pretty easy.</p>
+            <p>Also time to insert a shameless plug, I have worked on a small utility YA-CORS to scan for common CORS misconfigurations. You can find it <a href="https://github.com/0x-Apollyon/YA-CORS" target="_blank">here.</a></p>
         </div>
 
         <div class="blog-post">
-            <h2>6: Firebase on fire (This is also applicable to Supabase and other similar services)</h2>
-            <p>Many SaaS projects, especially those without a dedicated backend, use services like Firebase for authentication and data storage (firestore, real time db). If improperly configured, anyone can access these databases and read, write stuff to them. 
-            </p>
-            <p>This has been a recurring vulnerability, especially with startups (chattr.ai, Arc Browser). These are just a few examples. Many more SaaS startups and apps have been caught leaking private user data due to bad Firebase/Supabase configs.
-            </p>
-            <p>
-                The root of the problem is default public access. By default, Firebase Realtime Database and Firestore allow public read/write access until rules are manually set. Below is a very common and very insecure security rule.
-            </p>
-            <p class="highlight">{
+            <h2 id="firebase">6: Firebase on fire (and Supabase)<a href="#firebase" class="anchor-link" aria-label="Link to Firebase on fire">#</a></h2>
+            <p>Many SaaS projects, especially those without a dedicated backend, use services like Firebase for authentication and data storage (firestore, real time db). If improperly configured, anyone can access these databases and read, write stuff to them. </p>
+            <p>This has been a recurring vulnerability, especially with startups (chattr.ai, Arc Browser). These are just a few examples. Many more SaaS startups and apps have been caught leaking private user data due to bad Firebase/Supabase configs.</p>
+            <p>The root of the problem is default public access. By default, Firebase Realtime Database and Firestore allow public read/write access until rules are manually set. Below is a very common and very insecure security rule.</p>
+            
+            <pre class="code-block"><code class="language-json wrap-text"><script type="text/plain">{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}</script></code></pre>
 
-                "rules": {
-              
-                  ".read": true,
-              
-                  ".write": true
-              
-                }
-              
-              }</p>
-            <p>This means anyone on the internet can read all your data and modify or delete your database (reset user passwords, inject fake content and god knows what). Supabase is slightly better with Row Level Security (RLS), but if disabled, the database behaves like an open book for anyone with the API URL.
-            </p>
-            <p>
-                To fix this vulnerability, modify firestore rules to allow access only to authenticated users. For Supabase, do not disable (enable it if its disabled) Row Level Security (RLS) and write secure policies. This is very basic advice, read <a href="https://firebase.google.com/support/guides/security-checklist">this </a> and <a href="https://firebase.google.com/docs/rules/insecure-rules">this</a> for firebase. For supabase, read <a href="https://supabase.com/docs/guides/database/postgres/row-level-security">this</a>.
-
-            </p>
+            <p>This means anyone on the internet can read all your data and modify or delete your database (reset user passwords, inject fake content and god knows what). Supabase is slightly better with Row Level Security (RLS), but if disabled, the database behaves like an open book for anyone with the API URL.</p>
+            <p>To fix this vulnerability, modify firestore rules to allow access only to authenticated users. For Supabase, do not disable (enable it if its disabled) Row Level Security (RLS) and write secure policies. This is very basic advice, read <a href="https://firebase.google.com/support/guides/security-checklist" target="_blank">this</a> and <a href="https://firebase.google.com/docs/rules/insecure-rules" target="_blank">this</a> for firebase. For supabase, read <a href="https://supabase.com/docs/guides/database/postgres/row-level-security" target="_blank">this</a>.</p>
         </div>
+        
         <div class="blog-post">
-            <h2>7: Leaky s3 buckets</h2>
-            <p>Just like Firebase, many vibecoded projects also make use of s3 for storage, and it too is very easy to mess up and just like CORS vulnerabilities, the problems usually happen due to laziness and/or ignorance. The first, and the most common vulnerability which I have come across, is sensitive data in public, unsecure s3 buckets. Like many other vulnerabilities I have covered, even big corpporates (Twilio, Ford, Netflix) struggle with this.
-            </p>
-            <br><center><img src="./vibe_coding_imgs/netflix_s3.png" style="height: 400px; width: auto;">            </center> <br>
-            <p>
-                A threat actor can not only read from insecure buckets, but can also modify them. This can allow them to introduce malicious content, deface your webapp or even hold your files for ransom (Scattered Spider). Threat actors also love utilizing vulnerable s3 buckets as a way to exfiltrate data from their other operations without beind detected.
-            </p>
-            <br><center><img src="./vibe_coding_imgs/s3.png"></center> <br>
-            <p>
-                To fix this issue, make sure your buckets are private by default, allow access only to your app by using bucket policies (or specific users/roles). Read <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html">this</a>for more info.
-            </p>
+            <h2 id="leaky-s3-buckets">7: Leaky s3 buckets<a href="#leaky-s3-buckets" class="anchor-link" aria-label="Link to Leaky s3 buckets">#</a></h2>
+            <p>Just like Firebase, many vibecoded projects also make use of s3 for storage, and it too is very easy to mess up and just like CORS vulnerabilities, the problems usually happen due to laziness and/or ignorance. The first, and the most common vulnerability which I have come across, is sensitive data in public, unsecure s3 buckets. Like many other vulnerabilities I have covered, even big corporates (Twilio, Ford, Netflix) struggle with this.</p>
+            <img src="./vibe_coding_imgs/netflix_s3.png" alt="Netflix S3 bucket breach" class="post-image">
+            
+            <p>A threat actor can not only read from insecure buckets, but can also modify them. This can allow them to introduce malicious content, deface your webapp or even hold your files for ransom (Scattered Spider). Threat actors also love utilizing vulnerable s3 buckets as a way to exfiltrate data from their other operations without beind detected.</p>
+            <img src="./vibe_coding_imgs/s3.png" alt="S3 Bucket permissions" class="post-image">
+            
+            <p>To fix this issue, make sure your buckets are private by default, allow access only to your app by using bucket policies (or specific users/roles). Read <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html" target="_blank">this</a> for more info.</p>
         </div>
+        
         <div class="blog-post">
-            <h2>8: Ratelimits and anti bot measures</h2>
-            <p>If people can automate abuse on your app, they will. Whether its for financial gain, competitive advantage, or just for the lulz, attackers (or even regular users) will spam your endpoints, scrape your data, and abuse your services if you dont put proper ratelimiting and anti bot features in place. While there is no way you can stop 100% of the bots, you can take some steps to stop the vast majority of them.
-            </p>
-            <p>
-                Implement rate limits on API endpoints, especially the ones you think might be targetted by a threat actor. You can use IP based ratelimits or user based ratelimits, whichever suits your usecase. For login, signups, and sensitive actions, use reCAPTCHA or hCaptcha to block bots. Aside from all this make sure to monitor logs for suspicious traffic spikes.
-            </p>
-            <br><center><img src="./vibe_coding_imgs/captcha.png"></center> <br>
+            <h2 id="anti-bot">8: Ratelimits and anti bot measures<a href="#anti-bot" class="anchor-link" aria-label="Link to Ratelimits">#</a></h2>
+            <p>If people can automate abuse on your app, they will. Whether its for financial gain, competitive advantage, or just for the lulz, attackers (or even regular users) will spam your endpoints, scrape your data, and abuse your services if you dont put proper ratelimiting and anti bot features in place. While there is no way you can stop 100% of the bots, you can take some steps to stop the vast majority of them.</p>
+            <p>Implement rate limits on API endpoints, especially the ones you think might be targetted by a threat actor. You can use IP based ratelimits or user based ratelimits, whichever suits your usecase. For login, signups, and sensitive actions, use reCAPTCHA or hCaptcha to block bots. Aside from all this make sure to monitor logs for suspicious traffic spikes.</p>
+            <img src="./vibe_coding_imgs/captcha.png" alt="Captcha example" class="post-image">
         </div>
+        
         <div class="blog-post">
-            <h2>9: DoS attacks</h2>
-            <p>Denial of service attacks, or its elder brother, distributed denial of service (DDoS) attacks are some of the most common attacks that any webapp has to face. The barrier to entry is in the ground, and anyone, be it a basement dwelling nerd or a 12yo edgy child can launch. Also DDoS for hire services also exist, so best believe, if someone wants to DDoS your webapp, they will. 
-            </p>
-            <br><center><img src="./vibe_coding_imgs/ddos.png" style="height: auto; width: 500px;"></center> <br>
-            <p>If you arent prepared for an attack like this, you can very easily run up a cloud bill comparable to the GDP of a third world country.
-            </p>
-            <br><center><img src="./vibe_coding_imgs/aws.png" style="height: auto; width: 500px;"></center> <br>
-            <p>
-                There are many types of DDoS attacks, here I categorise the releavant ones into two categories
-            </p>
+            <h2 id="dos-attacks">9: DoS attacks<a href="#dos-attacks" class="anchor-link" aria-label="Link to DoS attacks">#</a></h2>
+            <p>Denial of service attacks, or its elder brother, distributed denial of service (DDoS) attacks are some of the most common attacks that any webapp has to face. The barrier to entry is in the ground, and anyone, be it a basement dwelling nerd or a 12yo edgy child can launch. Also DDoS for hire services also exist, so best believe, if someone wants to DDoS your webapp, they will. </p>
+            <img src="./vibe_coding_imgs/ddos.png" alt="DDoS attack diagram" class="post-image">
+            
+            <p>If you arent prepared for an attack like this, you can very easily run up a cloud bill comparable to the GDP of a third world country.</p>
+            <img src="./vibe_coding_imgs/aws.png" alt="Huge AWS Bill" class="post-image">
+            
+            <p>There are many types of DDoS attacks, here I categorise the releavant ones into two categories:</p>
             <p>Type 1: Just a massive spray of traffic, not very interesting if im being honest. Can be mitigated using a DDoS protection service like Cloudflare, AWS Shield, Akamai, and similar services that filter out malicious traffic before it reaches your server.</p>
-            <P>Type 2: Application layer attacks, these spam your webapp with queries which are resource intensive and your webapp dies a death by a thousand cuts. These are often trickier to deal with compared to just a massive spray of traffic. To prevent these types of attacks, implement rate limiting on resource intensive API endpoints or alternatively use services like Cloudflare WAF, AWS WAF, and fastly to detect and block known patterns of such attacks.</P>
-            <br><center><img src="./vibe_coding_imgs/cloudflare.png" style="height: auto; width: 400px;"></center> <br>
+            <p>Type 2: Application layer attacks, these spam your webapp with queries which are resource intensive and your webapp dies a death by a thousand cuts. These are often trickier to deal with compared to just a massive spray of traffic. To prevent these types of attacks, implement rate limiting on resource intensive API endpoints or alternatively use services like Cloudflare WAF, AWS WAF, and fastly to detect and block known patterns of such attacks.</p>
+            <img src="./vibe_coding_imgs/cloudflare.png" alt="Cloudflare firewall" class="post-image">
         </div>
+        
         <div class="blog-post">
-            <h2>10: SQL and NoSQL injections</h2>
-            <p>While this doesnt impact vibe coders as much as the other vulnerabilities, primarily because vibe coders are too dumb and lazy to use a proper SQL or NoSQL database. SQL injections have been here for decades and are still a menace, while NoSQL injections is the zoomer version impacting NoSQL databases. If you do use a SQL or NoSQL database, and you don’t sanitize inputs, you’re opening the gates to disaster. As previously stated, never trust the frontend. SQL injection happens when malicious SQL code makes its way into your database queries, usually through unsanitized user inputs.
-            </p>
-            <br><center><img src="./vibe_coding_imgs/sqlinjection.png" style="height: auto; width: 600px;"></center> <br>
-            <p>Example: Read the code given below, see if you can find how an attacker can exploit it.
-            </p>
-            <pre>
-                <code>
-import mysql.connector
-
+            <h2 id="sql-injections">10: SQL and NoSQL injections<a href="#sql-injections" class="anchor-link" aria-label="Link to SQL injections">#</a></h2>
+            <p>While this doesnt impact vibe coders as much as the other vulnerabilities, primarily because vibe coders are too dumb and lazy to use a proper SQL or NoSQL database. SQL injections have been here for decades and are still a menace, while NoSQL injections is the zoomer version impacting NoSQL databases. If you do use a SQL or NoSQL database, and you don’t sanitize inputs, you’re opening the gates to disaster. As previously stated, never trust the frontend. SQL injection happens when malicious SQL code makes its way into your database queries, usually through unsanitized user inputs.</p>
+            <img src="./vibe_coding_imgs/sqlinjection.png" alt="SQL Injection Comic" class="post-image">
+            
+            <p>Example: Read the code given below, see if you can find how an attacker can exploit it.</p>
+            
+            <pre class="code-block"><code class="language-python wrap-text"><script type="text/plain">import mysql.connector
 from flask import request, Flask
 
 app = Flask(__name__)
-
 db = mysql.connector.connect(user="root", password="password", database="users")
 
 @app.route("/login", methods=["POST"])
-
 def login():
-
     username = request.form["username"]
-
     password = request.form["password"]
-
     
-
     cursor = db.cursor()
-
     query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'"
-
     cursor.execute(query)
-
     
-
     if cursor.fetchone():
-
         return "Login successful"
-
     else:
-
-        return "Invalid credentials"
-                </code>
-            </pre>
-            <p>
-                NoSQL is basically the same, but impacts NoSQL databases such as Mongo. Example: This time, find the NoSQL injection -
-            </p>
-            <pre>
-                <code>
-from flask import Flask, request
-
+        return "Invalid credentials"</script></code></pre>
+            
+            <p>NoSQL is basically the same, but impacts NoSQL databases such as Mongo. Example: This time, find the NoSQL injection -</p>
+            
+            <pre class="code-block"><code class="language-python wrap-text"><script type="text/plain">from flask import Flask, request
 from pymongo import MongoClient
 
 app = Flask(__name__)
-
 client = MongoClient("mongodb://localhost:27017/")
 
 db = client["usersDB"]
-
 users_collection = db["users"]
 
 @app.route("/login", methods=["POST"])
-
 def login():
-
     username = request.json["username"]
-
     password = request.json["password"]
-
     
-
     user = users_collection.find_one({"username": username, "password": password})
-
     if user:
-
         return "Login successful"
-
     else:
+        return "Invalid credentials"</script></code></pre>
 
-        return "Invalid credentials"
-                </code>
-            </pre>
-            <p>
-                To fix most SQL and NoSQL injection vulnerabilities, sanitize user input before passing it through and use parametrized queries so the database treats user inputs as values, not SQL code, preventing injections.
-            </p>
+            <p>To fix most SQL and NoSQL injection vulnerabilities, sanitize user input before passing it through and use parametrized queries so the database treats user inputs as values, not SQL code, preventing injections.</p>
         </div>
-        <div class="blog-post">
-            <h2>Conclusion</h2>
+
+        <div class="blog-post" style="margin-bottom: 56px;">
+            <h2 id="conclusion">Conclusion<a href="#conclusion" class="anchor-link" aria-label="Link to Conclusion">#</a></h2>
             <p>So, thats it. Those were the 10 commandments of security in the era of vibecoders. As stated earlier, they will not make your app unhackable, but they will surely make it more safe. I hope this helps you secure your webapp, and not go insane fighting threat actors. Have fun vibecoding!!!</p>
+            
+            <div style="text-align: center; margin-top: 48px;">
+                <p class="highlight" style="font-size: 14px; margin-bottom: 16px;">HEY!!! YOU MADE IT TO THE END. HERE IS A CAT PICTURE FOR YOU</p>
+                <img src="./vibe_coding_imgs/blicky.png" alt="A cute cat picture" class="post-image" style="margin: 0 auto;">
+            </div>
         </div>
-        <p>HEY!!! YOU MADE IT TO THE END. HERE IS A CAT PICTURE FOR YOU</p>
-        <img src="./vibe_coding_imgs/blicky.png" style="height: auto; width: 1000px;">
 
     </div>
+
+    <script>
+    /* Using DOMContentLoaded ensures scripts fire predictably even on minified servers / CDNs */
+    document.addEventListener("DOMContentLoaded", (event) => {
+        
+        /* Safely extract raw unescaped code from script templates */
+        document.querySelectorAll('pre.code-block code').forEach(function(code) {
+            var rawData = code.querySelector('script[type="text/plain"]');
+            if (rawData) {
+                code.textContent = rawData.textContent.trim(); /* Extracts code safely ignoring < and > */
+            }
+        });
+
+        /* Initialize Highlight.js */
+        if (typeof hljs !== 'undefined') {
+            hljs.highlightAll();
+        }
+
+        var svg24 = function (d) {
+            return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+        };
+        var ICON = {
+            /* Standard overlapping rectangles copy icon */
+            copy: svg24('<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>'),
+            check: svg24('<polyline points="20 6 9 17 4 12"></polyline>'),
+            fold: svg24('<polyline points="18 15 12 9 6 15"></polyline>') /* Chevron arrow up */
+        };
+        
+        function button(cls, label, icon) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'icon-btn ' + cls;
+            b.title = b.ariaLabel = label;
+            b.setAttribute('aria-label', label);
+            b.innerHTML = icon;
+            return b;
+        }
+
+        document.querySelectorAll('pre.code-block').forEach(function (pre, i) {
+            var code = pre.querySelector('code');
+            if (!code) return; /* Prevent crashes if DOM got minified weirdly */
+
+            var lines = code.textContent.split('\n').length;
+            var wrap = document.createElement('div');
+            wrap.className = 'code-wrap';
+
+            var bar = document.createElement('div');
+            bar.className = 'code-bar';
+            var label = document.createElement('span');
+            label.textContent = 'code, ' + lines + ' lines';
+            var copy = button('copy', 'Copy code', ICON.copy);
+            bar.appendChild(label);
+            bar.appendChild(copy);
+
+            copy.addEventListener('click', function () {
+                var text = code.textContent;
+                function done() {
+                    copy.innerHTML = ICON.check;
+                    copy.setAttribute('aria-label', 'Copied');
+                    setTimeout(function () {
+                        copy.innerHTML = ICON.copy;
+                        copy.setAttribute('aria-label', 'Copy code');
+                    }, 1500);
+                }
+                function fallback() {
+                    var ta = document.createElement('textarea');
+                    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                    document.body.appendChild(ta); ta.select();
+                    try { document.execCommand('copy'); done(); } catch (e) {}
+                    document.body.removeChild(ta);
+                }
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text).then(done, fallback);
+                } else { fallback(); }
+            });
+
+            pre.parentNode.insertBefore(wrap, pre);
+            wrap.appendChild(bar);
+            wrap.appendChild(pre);
+
+            if (lines > 12) {
+                pre.id = 'code-' + i;
+                var foot = document.createElement('div');
+                foot.className = 'code-foot';
+                var fold = button('fold', 'Collapse code', ICON.fold);
+                fold.setAttribute('aria-controls', pre.id);
+                fold.setAttribute('aria-expanded', 'true');
+                fold.addEventListener('click', function () {
+                    var collapsed = wrap.classList.toggle('collapsed');
+                    fold.setAttribute('aria-label', collapsed ? 'Expand code' : 'Collapse code');
+                    fold.title = fold.getAttribute('aria-label');
+                    fold.setAttribute('aria-expanded', String(!collapsed));
+                });
+                foot.appendChild(fold);
+                wrap.appendChild(foot);
+            }
+        });
+
+        /* tab disguise */
+        const folder = "./../";
+        const originalTitle = document.title;
+        let favicon = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        favicon.rel = 'icon';
+        document.head.appendChild(favicon);
+        const originalIcon = favicon.href;
+
+        const disguises = [
+            { title: "Inbox (13) - Gmail", icon: folder + "gmail_favicon.ico" },
+            { title: "GitHub", icon: folder + "github_icon.png" },
+            { title: "(2) Discord | Friends", icon: folder + "discord_icon.png" },
+            { title: "Home / X", icon: folder + "x_favicon.png" },
+            { title: "ChatGPT", icon: folder + "chatgpt_favicon.png" },
+            { title: "Claude", icon: folder + "claude_icon.png" }
+        ];
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                const random = disguises[Math.floor(Math.random() * disguises.length)];
+                document.title = random.title;
+                favicon.href = random.icon;
+            } else {
+                document.title = originalTitle;
+                favicon.href = originalIcon;
+            }
+        });
+
+    });
+    </script>
 </body>
 </html>
