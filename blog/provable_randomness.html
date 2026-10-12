@@ -9,6 +9,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     
+    <link rel="alternate" type="text/markdown" href="provable_randomness.md" title="Markdown version of Provable Randomness in Online Gambling">
+
+    <meta name="description" content="A Python implementation of a provably fair online Mines game that ensures randomness through cryptographic seed hashing.">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://abbadon.tech/blog/provable_randomness.html">
+    <meta property="og:title" content="Provable Randomness in Online Gambling">
+    <meta property="og:description" content="A Python implementation of a provably fair online Mines game that ensures randomness through cryptographic seed hashing.">
+    <meta property="og:image" content="https://abbadon.tech/blog/chausar.jpg">
+    <meta name="theme-color" content="#ffffff">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://abbadon.tech/blog/provable_randomness.html">
+    <meta name="twitter:title" content="Provable Randomness in Online Gambling">
+    <meta name="twitter:description" content="A Python implementation of a provably fair online Mines game that ensures randomness through cryptographic seed hashing.">
+    <meta name="twitter:image" content="https://abbadon.tech/blog/chausar.jpg">
+
     <!-- Highlight.js for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -302,6 +319,34 @@
             .hljs { font-size: 12px; padding: 14px !important; }
         }
     </style>
+
+    <script type="application/ld+json">
+        {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Provable, Fair Randomness in Online Gambling",
+        "author": {
+            "@type": "Person",
+            "name": "Abbadon",
+            "url": "https://abbadon.tech"
+        },
+        "url": "https://abbadon.tech/blog/provable_randomness.html",
+        "encoding": [
+            {
+            "@type": "MediaObject",
+            "encodingFormat": "text/html",
+            "contentUrl": "https://abbadon.tech/blog/provable_randomness.html"
+            },
+            {
+            "@type": "MediaObject",
+            "encodingFormat": "text/markdown",
+            "contentUrl": "https://abbadon.tech/blog/provable_randomness.md",
+            "description": "Raw markdown text optimized for AI processing and LLM ingestion."
+            }
+        ],
+        "keywords": "Python, Provably Fair, Cryptography, Gambling, Randomness, Hashing, SHA256"
+        }
+    </script>
 </head>
 <body>
 
@@ -318,10 +363,17 @@
     </div>
 
     <div class="content">
-        <!-- REFINED BACK BUTTON -->
-        <a href="index.html" class="home-button">
-            <span>&larr;</span> read something else
-        </a>
+        <!-- REFINED BACK BUTTON & AI MARKDOWN LINK -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+            <a href="index.html" class="home-button" style="margin-bottom: 0;">
+                <span>&larr;</span> read something else
+            </a>
+            
+            <a href="provable_randomness.md" type="text/markdown" target="_blank" class="home-button" style="margin-bottom: 0;" aria-label="Read raw Markdown format">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                .md for AI
+            </a>
+        </div>
 
         <div class="blog-title">Provable, Fair Randomness in Online Gambling</div>
 
